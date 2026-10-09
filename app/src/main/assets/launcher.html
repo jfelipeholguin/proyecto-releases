@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyecto</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#F5F3EC;color:#191813;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem}
+.grid{display:flex;flex-direction:column;gap:1rem;width:100%;max-width:400px}
+.card{background:#fff;border:1px solid #E2DED1;border-radius:12px;padding:1.5rem;text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s;cursor:pointer;display:flex;align-items:center;gap:1rem}
+.card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.card .icon{font-size:2rem;width:48px;text-align:center}
+.card .label{font-size:1.1rem;font-weight:600}
+.card .desc{font-size:.8rem;color:#7A7566;margin-top:.2rem}
+h1{font-family:system-ui,sans-serif;font-size:1.5rem;text-align:center;margin-bottom:1.5rem;color:#191813}
+</style>
+</head>
+<body>
+<div class="grid">
+  <h1>Proyecto</h1>
+  <a class="card" href="suma-plus.html">
+    <div class="icon">✚</div>
+    <div><div class="label">Suma+</div><div class="desc">Diario positivo — registro de acciones y gratitud</div></div>
+  </a>
+  <a class="card" href="salud.html">
+    <div class="icon">🩺</div>
+    <div><div class="label">Salud</div><div class="desc">Sistemas del usuario — alimentación, sueño, entorno</div></div>
+  </a>
+  <a class="card" href="turno-del-dia.html">
+    <div class="icon">📅</div>
+    <div><div class="label">Turnos</div><div class="desc">Calendario de turnos de trabajo</div></div>
+  </a>
+</div>
+</body>
+</html>

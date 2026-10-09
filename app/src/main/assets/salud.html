@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistemas del Usuario</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧩</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400;1,9..144,600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f5f6f2; --ink:#181b20; --ink-soft:#5b616b; --line:#e2e4dc; --card:#fff;
+  --c1:#d8433c; --c2:#e39a18; --c3:#e0762c; --c4:#3a6fd8; --c5:#8250d4; --c6:#3a3f47;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Instrument Sans',system-ui,sans-serif;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(#d9dcd2 1px,transparent 1.2px);background-size:22px 22px;opacity:.45;pointer-events:none;z-index:0}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+button{font:inherit;color:inherit}
+
+/* ---------- Cabecera ---------- */
+header{padding:52px 0 0}
+.kicker{font-size:12px;letter-spacing:.17em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;display:flex;align-items:center;gap:10px}
+.kicker::before{content:"";width:26px;height:2px;background:var(--ink);flex:none}
+h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(50px,7vw,84px);line-height:.98;letter-spacing:-.02em;margin:16px 0 10px}
+h1 .word{font-style:italic;font-weight:400}
+.meta{font-size:13.5px;color:var(--ink-soft)}
+.meta em{font-family:'Fraunces',serif;font-style:italic;color:var(--ink)}
+
+/* Barra apilada de proporciones */
+.stack{display:flex;gap:3px;height:16px;margin-top:30px;width:100%}
+.seg{border:0;padding:0;border-radius:5px;background:var(--c);width:0;cursor:pointer;transition:width .9s cubic-bezier(.22,1,.3,1),opacity .25s,transform .2s,filter .2s}
+.seg:hover{transform:scaleY(1.4);filter:brightness(1.06)}
+.seg:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.stack.focused .seg:not(.active){opacity:.16}
+.stack.focused .seg.active{transform:scaleY(1.25)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:14px}
+.lg{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-soft);background:none;border:0;cursor:pointer;padding:3px 0;transition:color .2s}
+.lg .dot{width:8px;height:8px;border-radius:50%;background:var(--c);flex:none}
+.lg b{font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink)}
+.lg:hover{color:var(--ink)}
+.lg.active{color:var(--ink);text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--c)}
+
+/* ---------- Layout ---------- */
+.layout{display:grid;grid-template-columns:232px 1fr;gap:40px;margin-top:46px;align-items:start;padding-bottom:20px}
+
+/* Navegación lateral */
+.nav{position:sticky;top:24px;display:flex;flex-direction:column;gap:4px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;border:1px solid transparent;background:transparent;font-size:13.5px;font-weight:500;color:var(--ink-soft);cursor:pointer;text-align:left;transition:background .2s,color .2s,border-color .2s}
+.nav-item:hover{background:#eceee6;color:var(--ink)}
+.nav-item.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.nav-item .ncount{margin-left:auto;font-variant-numeric:tabular-nums;font-size:12px;opacity:.65}
+.swatch{width:10px;height:10px;border-radius:3px;background:var(--c);flex:none}
+.swatch.all{background:conic-gradient(var(--c1) 0 60deg,var(--c2) 60deg 120deg,var(--c3) 120deg 180deg,var(--c4) 180deg 240deg,var(--c5) 240deg 300deg,var(--c6) 300deg 360deg);border-radius:50%}
+.hint{margin-top:20px;font-size:11.5px;color:#9aa0a8;line-height:1.7}
+kbd{border:1px solid var(--line);background:#fff;border-radius:4px;padding:1px 5px;font-size:10.5px;font-family:inherit}
+
+/* Barra de herramientas */
+.toolbar{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.search{position:relative;flex:1;min-width:220px;max-width:400px}
+.search input{width:100%;padding:10px 12px 10px 36px;border:1px solid var(--line);border-radius:10px;background:#fff;font:inherit;font-size:14px;transition:border-color .2s,box-shadow .2s}
+.search input:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(24,27,32,.08)}
+.search svg{position:absolute;left:11px;top:50%;translate:0 -50%;color:#9aa0a8;pointer-events:none}
+#resultCount{font-size:12.5px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+#resultCount:empty{display:none}
+.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 13px;font-size:12.5px;font-weight:600;cursor:pointer;margin-left:auto;transition:background .2s,color .2s,border-color .2s}
+.btn:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn-link{color:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+
+/* Grupos y filas */
+.group{margin-bottom:28px;animation:rise .45s both}
+.ghead{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft);margin:0 2px 10px}
+.ghead .dot{width:8px;height:8px;border-radius:50%;background:var(--c);flex:none}
+.gcount{font-weight:600;color:#b3b8ae}
+.row{background:var(--card);border:1px solid var(--line);border-radius:11px;margin-bottom:7px;overflow:hidden;position:relative;transition:border-color .2s,box-shadow .25s,transform .2s;animation:rise .45s both}
+.row::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c);opacity:0;transition:opacity .25s}
+.row:hover{border-color:#c9cdbf;transform:translateY(-1px)}
+.row.open{border-color:color-mix(in srgb,var(--c) 45%,var(--line));box-shadow:0 8px 20px -14px rgba(24,27,32,.3)}
+.row.open::before{opacity:1}
+.rowhead{width:100%;display:flex;align-items:center;gap:12px;padding:13px 16px;background:none;border:0;font-size:14.5px;font-weight:600;cursor:pointer;text-align:left;line-height:1.3}
+.rowhead:focus-visible{outline:2px solid var(--ink);outline-offset:-3px;border-radius:10px}
+.rowhead .dot{width:9px;height:9px;border-radius:50%;background:var(--c);flex:none}
+.chev{margin-left:auto;flex:none;transition:transform .3s;color:#b6bbc0}
+.row.open .chev{transform:rotate(180deg)}
+.rbody{display:grid;grid-template-rows:0fr;transition:grid-template-rows .38s cubic-bezier(.4,0,.2,1)}
+.row.open .rbody{grid-template-rows:1fr}
+.rbody-in{overflow:hidden}
+.rbody p{margin:0;padding:0 16px 16px 37px;font-size:14px;line-height:1.65;color:#454b54;max-width:74ch}
+.rbody strong{color:var(--ink)}
+
+.empty{display:none;text-align:center;padding:56px 24px;color:var(--ink-soft);border:1px dashed var(--line);border-radius:14px;background:#fff}
+.empty.on{display:block;animation:rise .4s both}
+.empty b{display:block;font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:22px;color:var(--ink);margin-bottom:6px}
+
+footer{margin:56px 0 44px;padding-top:18px;border-top:1px solid var(--line);font-family:'Fraunces',serif;font-style:italic;font-size:13.5px;color:var(--ink-soft)}
+
+#tip{position:fixed;pointer-events:none;background:var(--ink);color:#fff;padding:7px 11px;border-radius:8px;font-size:12px;line-height:1.4;opacity:0;transform:translateY(5px);transition:opacity .15s,transform .15s;z-index:60;white-space:nowrap;box-shadow:0 8px 20px -8px rgba(0,0,0,.35)}
+#tip.on{opacity:1;transform:none}
+#tip b{font-variant-numeric:tabular-nums}
+
+@keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;gap:22px}
+  .nav{position:static;flex-direction:row;overflow-x:auto;padding-bottom:8px;gap:6px;-webkit-overflow-scrolling:touch}
+  .nav-item{flex:none;border:1px solid var(--line);background:#fff}
+  .nav-item.active{background:var(--ink);border-color:var(--ink)}
+  .nav-item .ncount{display:none}
+  .hint{display:none}
+  header{padding-top:36px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Sistemas del usuario</div>
+    <h1><span id="bigCount">0</span> <span class="word">sistemas</span></h1>
+    <p class="meta">Sistemas personales en equilibrio · organizados en 3 sistemas · Última actualización: <em>agosto 2026</em></p>
+    <div class="stack" id="stack" aria-label="Distribución por sistema"></div>
+    <div class="legend" id="legend"></div>
+  </header>
+
+  <div class="layout">
+    <nav class="nav" id="nav" aria-label="Filtrar por sistema"></nav>
+
+    <section>
+      <div class="toolbar">
+        <div class="search">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <input type="search" id="q" placeholder="Buscar sistema, elemento o detalle…" autocomplete="off">
+        </div>
+        <span id="resultCount"></span>
+        <a class="btn btn-link" href="turno-del-dia.html" target="_blank" rel="noopener">Turno del día ↗</a>
+        <button class="btn" id="expandAll">Expandir todos</button>
+      </div>
+      <div id="list"></div>
+      <div class="empty" id="empty"><b>Sin resultados</b><span id="emptyMsg"></span></div>
+    </section>
+  </div>
+
+  <footer>Documento vivo — actualizar según la evolución de cada sistema y nuevas valoraciones.</footer>
+</div>
+
+<div id="tip" role="tooltip"></div>
+
+<script>
+/* ================= DATOS ================= */
+const CATS=[
+  {id:'alimentacion', nombre:'Sistema de Alimentación', corto:'Alimentación', color:'#2e7d32'},
+  {id:'sueno',        nombre:'Sistema de Sueño',       corto:'Sueño',        color:'#3a6fd8'},
+  {id:'entorno',      nombre:'Sistema de Entorno',     corto:'Entorno',      color:'#3a3f47'}
+];
+const ITEMS={
+alimentacion:[
+ {n:'Alimentación equilibrada', d:'2 huevos y queso · arroz, pollo y queso · harina de trigo, huevo y queso'},
+ {n:'Regulación de la ingesta', d:'Comer con horarios estables y por hambre real, no por aburrimiento o emoción. Evitar que la comida sea la vía principal de regulación emocional.'},
+ {n:'Hidratación', d:'Consumo regular de agua a lo largo del día. La deshidratación leve afecta energía, concentración y saciedad.'},
+ {n:'Candidiasis (Candina)', d:'Infección por el hongo <em>Candida</em> (normalmente <em>C. albicans</em>). Puede afectar mucosas orales, genitales o intestinales. Señal de desequilibrio en la microbiota o inmunosupresión leve. En el intestino puede contribuir a síntomas digestivos crónicos.'},
+ {n:'Estreñimiento crónico', d:'Reducción persistente de la frecuencia o dificultad en la evacuación intestinal, con heces duras y esfuerzo excesivo. Puede tener causa funcional, estructural o estar relacionada con la disinergia defecatoria. Impacta directamente la calidad de vida y puede agravar otras condiciones del tracto digestivo bajo.'},
+ {n:'Síndrome del intestino irritable (SII)', d:'Trastorno funcional del intestino caracterizado por dolor abdominal recurrente asociado a cambios en la frecuencia o consistencia de las heces, sin causa orgánica identificable. Tiene componente emocional y neurológico significativo (eje intestino-cerebro). Puede incluir episodios de diarrea, estreñimiento o ambos alternados.'},
+ {n:'Hemorroides crónicas', d:'Dilatación persistente de los plexos venosos del canal anal. Se manifiesta con sangrado rectal, dolor, picor y prolapso. En casos crónicos como este, suelen estar relacionadas con estreñimiento crónico y esfuerzo defecatorio prolongado.'}
+],
+sueno:[
+ {n:'Higiene del sueño', d:'Horario de acostarse y levantarse estable, dormitorio oscuro, fresco y sin pantallas antes de dormir. El sueño es el proceso de reparación central del cuerpo y sostiene el funcionamiento de los demás sistemas.'},
+ {n:'Duración del sueño', d:'Objetivo de 7–9 horas por noche. El déficit crónico de sueño deteriora metabolismo, cognición, estado de ánimo y regulación emocional.'},
+ {n:'Bruxismo', d:'Apretamiento o rechinamiento involuntario de los dientes, generalmente durante el sueño (bruxismo nocturno) aunque también puede ocurrir en vigilia. Genera desgaste dental, sobrecarga de la ATM, tensión en los músculos maseteros y temporales, cefaleas y dolor facial. <strong>Diagnosticado en consulta con cirujano maxilofacial — se prescribió placa de bruxismo (férula oclusal) como tratamiento.</strong> La placa actúa redistribuyendo las fuerzas de mordida y protegiendo el esmalte dental. Tiene fuerte relación con el estrés, la ansiedad y los patrones de tensión muscular crónica.'},
+ {n:'Alcoholismo', d:'Trastorno por uso de alcohol caracterizado por dependencia física y/o psicológica. Impacta el hígado, sistema nervioso, salud mental y relaciones interpersonales, y altera gravemente la arquitectura del sueño. Puede ser mecanismo de automedicación para ansiedad o depresión.'},
+ {n:'Consumo de cannabis', d:'Uso de marihuana con potencial impacto en motivación, memoria a corto plazo, función cognitiva y salud mental, especialmente en consumo crónico. Puede agravar ansiedad, depresión y apatía en ciertos perfiles, y afecta la calidad del sueño.'}
+],
+entorno:[
+ {n:'Organización del entorno', d:'El sistema de entorno se define como la organización del espacio y las rutinas del usuario para maximizar beneficios y minimizar fricción. Un entorno diseñado correctamente hace fácil lo bueno y difícil lo malo, y por eso impulsa a los demás sistemas.'},
+ {n:'Entorno digital', d:'Gestión de pantallas, redes sociales y notificaciones para que el ocio digital no compita contra el descanso, el foco o las relaciones reales. Reducir el ruido digital favorece los sistemas de sueño y atención.'},
+ {n:'Aislamiento social', d:'Reducción severa o ausencia de contacto social significativo. Puede ser voluntaria o resultado de dificultades interpersonales. Asociada a peores resultados en salud física y mental, incluyendo mayor riesgo cardiovascular y deterioro cognitivo.'},
+ {n:'Soledad', d:'Estado subjetivo de desconexión o falta de compañía significativa, independientemente del número de personas alrededor. Impacta directamente el bienestar emocional y la salud general.'},
+ {n:'Dificultades de socialización', d:'Problemas para iniciar, mantener o gestionar interacciones sociales de forma cómoda y efectiva. Puede tener base en ansiedad social, patrones aprendidos en la infancia o déficits en habilidades interpersonales.'},
+ {n:'Falta de propósito vital', d:'Sensación de ausencia de dirección, significado o razón de ser en la vida. Relacionada con la teoría de la autodeterminación (falta de autonomía, competencia o conexión). Puede generar apatía, anhedonia y vulnerabilidad a conductas adictivas.'},
+ {n:'Adicción al teléfono móvil', d:'Uso compulsivo y excesivo del smartphone que interfiere con actividades cotidianas, relaciones o descanso. Involucra mecanismos dopaminérgicos similares a otras adicciones conductuales. Frecuentemente co-ocurre con adicción a redes sociales.'},
+ {n:'Adicción a redes sociales', d:'Patrón compulsivo de uso de plataformas sociales (Instagram, TikTok, etc.) motivado por validación, evasión o estímulo constante. Genera ciclos de comparación social, ansiedad y baja autoestima.'},
+ {n:'Sedentarismo', d:'Nivel de actividad física insuficiente para mantener la salud. Contribuye a deterioro metabólico, cardiovascular, musculoesquelético y mental. Agrava prácticamente todos los sistemas listados.'},
+ {n:'Dificultades en regulación emocional', d:'Incapacidad o dificultad para modular la intensidad, duración o expresión de las emociones de forma adaptativa. Puede manifestarse como reactividad emocional extrema, dificultad para calmarse o supresión emocional crónica. Base frecuente de muchas otras condiciones listadas.'}
+]};
+
+/* ================= ESTADO ================= */
+const TOTAL = Object.values(ITEMS).reduce((a,arr)=>a+arr.length,0);
+let activeCat='all', query='', expanded=new Set();
+
+const norm = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const $ = id => document.getElementById(id);
+const catById = id => CATS.find(c=>c.id===id);
+
+/* ================= CONTADOR ================= */
+(function countUp(){
+  const el=$('bigCount'), t0=performance.now(), dur=900;
+  (function tick(t){
+    const p=Math.min(1,(t-t0)/dur);
+    el.textContent=Math.round(TOTAL*(1-Math.pow(1-p,3)));
+    if(p<1) requestAnimationFrame(tick);
+  })(t0);
+})();
+
+/* ================= BARRA APILADA + LEYENDA ================= */
+const stackEl=$('stack'), legendEl=$('legend'), tip=$('tip');
+CATS.forEach((cat,i)=>{
+  const count=ITEMS[cat.id].length, pct=(count/TOTAL*100).toFixed(1);
+  const seg=document.createElement('button');
+  seg.className='seg'; seg.dataset.cat=cat.id;
+  seg.style.setProperty('--c',cat.color);
+  seg.style.transitionDelay=(i*90)+'ms';
+  seg.setAttribute('aria-label',`${cat.nombre}: ${count} elementos (${pct}%)`);
+  seg.addEventListener('click',()=>setFilter(activeCat===cat.id?'all':cat.id));
+  seg.addEventListener('mouseenter',()=>{tip.innerHTML=`${cat.nombre} — <b>${count}</b> elem. (<b>${pct}%</b>)`;tip.classList.add('on');});
+  seg.addEventListener('mousemove',e=>{tip.style.left=Math.min(e.clientX+14,innerWidth-tip.offsetWidth-12)+'px';tip.style.top=(e.clientY-40)+'px';});
+  seg.addEventListener('mouseleave',()=>tip.classList.remove('on'));
+  stackEl.appendChild(seg);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>seg.style.width=pct+'%'));
+
+  const lg=document.createElement('button');
+  lg.className='lg'; lg.dataset.cat=cat.id;
+  lg.style.setProperty('--c',cat.color);
+  lg.innerHTML=`<span class="dot"></span>${cat.corto}&nbsp;<b>${count}</b>`;
+  lg.addEventListener('click',()=>setFilter(activeCat===cat.id?'all':cat.id));
+  legendEl.appendChild(lg);
+});
+
+/* ================= NAVEGACIÓN ================= */
+const navEl=$('nav');
+const allBtn=document.createElement('button');
+allBtn.className='nav-item active'; allBtn.dataset.cat='all';
+allBtn.innerHTML=`<span class="swatch all"></span>Todos los sistemas<span class="ncount">${TOTAL}</span>`;
+allBtn.addEventListener('click',()=>setFilter('all'));
+navEl.appendChild(allBtn);
+CATS.forEach(cat=>{
+  const b=document.createElement('button');
+  b.className='nav-item'; b.dataset.cat=cat.id;
+  b.innerHTML=`<span class="swatch" style="--c:${cat.color}"></span>${cat.nombre}<span class="ncount">${ITEMS[cat.id].length}</span>`;
+  b.addEventListener('click',()=>setFilter(activeCat===cat.id?'all':cat.id));
+  navEl.appendChild(b);
+});
+
+/* ================= LISTA ================= */
+const listEl=$('list'), emptyEl=$('empty');
+
+function matches(it){
+  if(!query) return true;
+  return norm(it.n+' '+it.d).includes(query);
+}
+
+function render(){
+  let html='', shown=0, gi=0;
+  for(const cat of CATS){
+    if(activeCat!=='all' && cat.id!==activeCat) continue;
+    const items=ITEMS[cat.id].filter(matches);
+    if(!items.length) continue;
+    html+=`<section class="group" style="--c:${cat.color};animation-delay:${gi*45}ms">
+      <header class="ghead"><span class="dot"></span>${cat.nombre}<span class="gcount">· ${items.length}</span></header>`;
+    items.forEach((it,i)=>{
+      const key=cat.id+'|'+it.n, open=expanded.has(key);
+      html+=`<article class="row${open?' open':''}" data-key="${key}" style="--c:${cat.color};animation-delay:${gi*45+i*22}ms">
+        <button class="rowhead" aria-expanded="${open}">
+          <span class="dot"></span><span>${it.n}</span>
+          <svg class="chev" width="14" height="14" viewBox="0 0 14 14"><path d="M2 5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="rbody"><div class="rbody-in"><p>${it.d}</p></div></div>
+      </article>`;
+      shown++;
+    });
+    html+='</section>'; gi++;
+  }
+  listEl.innerHTML=html;
+  emptyEl.classList.toggle('on',shown===0);
+  $('emptyMsg').textContent=query?`No hay elementos que coincidan con «${query}».`:'No hay elementos en este sistema.';
+  $('resultCount').textContent=query?`${shown} resultado${shown!==1?'s':''} para «${query}»`:'';
+}
+
+listEl.addEventListener('click',e=>{
+  const head=e.target.closest('.rowhead');
+  if(!head) return;
+  const row=head.closest('.row'), key=row.dataset.key, open=row.classList.toggle('open');
+  head.setAttribute('aria-expanded',open);
+  open?expanded.add(key):expanded.delete(key);
+  syncExpandBtn();
+});
+
+/* ================= FILTRO GLOBAL ================= */
+function setFilter(cat){
+  activeCat=cat;
+  document.querySelectorAll('[data-cat]').forEach(el=>{
+    el.classList.toggle('active',el.dataset.cat===cat);
+  });
+  stackEl.classList.toggle('focused',cat!=='all');
+  render();
+}
+
+/* ================= BÚSQUEDA ================= */
+const input=$('q');
+input.addEventListener('input',()=>{query=norm(input.value.trim());render();});
+input.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){input.value='';query='';render();input.blur();}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='/' && document.activeElement!==input){e.preventDefault();input.focus();}
+});
+
+/* ================= EXPANDIR TODO ================= */
+const exBtn=$('expandAll');
+function syncExpandBtn(){
+  const rows=[...listEl.querySelectorAll('.row')];
+  const allOpen=rows.length && rows.every(r=>r.classList.contains('open'));
+  exBtn.textContent=allOpen?'Contraer todos':'Expandir todos';
+}
+exBtn.addEventListener('click',()=>{
+  const rows=[...listEl.querySelectorAll('.row')];
+  const allOpen=rows.length && rows.every(r=>r.classList.contains('open'));
+  rows.forEach(r=>{
+    r.classList.toggle('open',!allOpen);
+    r.querySelector('.rowhead').setAttribute('aria-expanded',!allOpen);
+    const key=r.dataset.key;
+    allOpen?expanded.delete(key):expanded.add(key);
+  });
+  syncExpandBtn();
+});
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>suma+ — el lado bueno de tus acciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F5F3EC; --paper2:#FBFAF5; --ink:#191813; --soft:#7A7566;
+  --line:#E2DED1; --accent:#1E6B4E; --accent-soft:#E3EEE6; --warn:#B4552F;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:"Instrument Sans",system-ui,sans-serif;font-size:15.5px;line-height:1.55;-webkit-font-smoothing:antialiased}
+::selection{background:var(--accent);color:var(--paper)}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:99;opacity:.045;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.mono{font-family:"Spline Sans Mono",monospace}
+.wrap{max-width:1120px;margin-inline:auto;padding-inline:clamp(1rem,4vw,2.5rem)}
+.kicker{font-family:"Spline Sans Mono",monospace;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft)}
+.kicker .n{color:var(--accent);margin-right:.5rem}
+
+/* ── barra superior ─────────────────────────── */
+.top{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:1.2rem;
+  padding:.8rem clamp(1rem,4vw,2.5rem);background:rgba(245,243,236,.88);backdrop-filter:blur(9px);border-bottom:1px solid var(--line)}
+.brand{font-family:"Fraunces",serif;font-weight:600;font-size:1.3rem;color:var(--ink);text-decoration:none;letter-spacing:-.01em}
+.brand sup{color:var(--accent);font-weight:700;font-size:.65em}
+.tag{color:var(--soft);font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;min-width:16ch}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:1rem}
+.today{color:var(--soft);font-size:.64rem;letter-spacing:.12em;text-transform:uppercase}
+.pill{border:1px solid var(--line);background:var(--paper2);padding:.34rem .8rem;font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);display:inline-flex;gap:.5rem;align-items:baseline}
+.pill b{color:var(--accent);font-size:.85rem;font-variant-numeric:tabular-nums}
+.pill.pop{animation:pop .45s cubic-bezier(.2,.7,.2,1)}
+@keyframes pop{35%{transform:scale(1.1)}}
+.linkbtn{background:none;border:0;cursor:pointer;color:var(--soft);font-family:"Spline Sans Mono",monospace;font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;padding:.3rem 0;border-bottom:1px solid transparent;transition:.2s}
+.linkbtn:hover{color:var(--ink);border-color:var(--ink)}
+.linkbtn.warn{color:var(--warn)}
+
+/* ── apertura / compositor ──────────────────── */
+.display{font-family:"Fraunces",serif;font-weight:390;font-size:clamp(2.5rem,6.4vw,4.6rem);line-height:1.03;letter-spacing:-.02em;margin-top:clamp(1.6rem,3vw,2.4rem)}
+.display em{font-style:italic;color:var(--accent);font-weight:430}
+.mask{display:block;overflow:hidden}
+.mask>span{display:block;transform:translateY(115%);transition:transform .9s cubic-bezier(.2,.75,.15,1)}
+.mask.in>span{transform:none}
+.composer-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(2rem,5vw,4.5rem);margin-top:clamp(2rem,4.5vw,3.4rem);align-items:start}
+.bigrow{position:relative;display:flex;align-items:center;gap:1rem;border-bottom:1px solid var(--line);margin-top:.5rem;transition:border-color .25s}
+.bigrow::after{content:"";position:absolute;left:0;bottom:-1px;height:1px;width:100%;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .4s cubic-bezier(.2,.7,.2,1)}
+.bigrow:focus-within::after{transform:scaleX(1)}
+.big{flex:1;min-width:0;background:transparent;border:0;outline:0;font-family:"Fraunces",serif;font-weight:400;font-size:clamp(1.45rem,3.2vw,2.2rem);padding:.65rem 0;color:var(--ink);caret-color:var(--accent)}
+.big::placeholder{color:#BDB8A8;font-style:italic}
+.round{flex:none;width:46px;height:46px;border-radius:50%;border:1px solid var(--ink);background:transparent;color:var(--ink);font-size:1.2rem;cursor:pointer;display:grid;place-items:center;transition:.25s}
+.round:hover{background:var(--ink);color:var(--paper);transform:translateY(-2px)}
+.round:active{transform:scale(.94)}
+.hint{margin-top:.8rem;color:var(--soft);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase}
+.action-title{font-family:"Fraunces",serif;font-style:italic;font-weight:450;color:var(--accent);font-size:clamp(1.35rem,2.8vw,1.9rem);margin-top:.2rem}
+.sugg{display:flex;flex-wrap:wrap;gap:.55rem;align-items:center;margin-top:1.3rem}
+.s-label{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
+.chip{border:1px solid var(--line);background:var(--paper2);border-radius:999px;padding:.38rem .85rem;font-size:.82rem;color:var(--ink);cursor:pointer;transition:.2s}
+.chip:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+.plist{list-style:none;margin-top:1.7rem}
+.plist li{display:flex;gap:1.1rem;align-items:baseline;padding:.68rem 0;border-bottom:1px dashed var(--line);animation:rowin .5s cubic-bezier(.2,.7,.2,1) both}
+@keyframes rowin{from{opacity:0;transform:translateY(12px)}}
+.plist .idx{font-family:"Spline Sans Mono",monospace;font-size:.66rem;color:var(--soft)}
+.plist .txt{flex:1}
+.x{background:none;border:0;color:var(--soft);cursor:pointer;font-size:1rem;line-height:1;opacity:0;transition:.2s;padding:.2rem .4rem}
+li:hover .x,.action-row:hover .x{opacity:1}
+.x:hover{color:var(--warn)}
+.f1{position:absolute;right:60px;top:-4px;font-family:"Fraunces",serif;font-style:italic;font-size:1.25rem;color:var(--accent);pointer-events:none;animation:f1 .9s ease-out forwards}
+@keyframes f1{to{opacity:0;transform:translateY(-46px)}}
+#closeAction{margin-top:1.5rem}
+
+/* panel ahora */
+.now-panel{position:sticky;top:92px;border:1px solid var(--line);background:var(--paper2);padding:1.7rem 1.7rem 1.4rem}
+.bignum{font-family:"Fraunces",serif;font-weight:300;font-size:clamp(4rem,9vw,6.6rem);line-height:1;color:var(--accent);font-variant-numeric:tabular-nums;transition:transform .3s}
+.bignum.tick{animation:pop .4s}
+.now-cap{margin-top:.5rem;color:var(--soft);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;line-height:1.9}
+.now-meta{display:flex;gap:2.2rem;border-top:1px solid var(--line);margin-top:1.3rem;padding-top:1.1rem}
+.now-meta b{font-family:"Fraunces",serif;font-weight:500;font-size:1.5rem;display:block;font-variant-numeric:tabular-nums}
+.now-meta span{font-family:"Spline Sans Mono",monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
+
+/* ── secciones ──────────────────────────────── */
+.rule{border:0;border-top:1px solid var(--line);margin-block:clamp(3rem,6vw,4.6rem)}
+.sec-title{font-family:"Fraunces",serif;font-weight:430;font-size:clamp(1.55rem,3vw,2.15rem);letter-spacing:-.01em;margin-top:.45rem}
+.sec-head.between{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;flex-wrap:wrap}
+.rv{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+
+/* datos */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);margin-top:2.1rem}
+.stat{padding:.4rem 1.4rem;border-left:1px solid var(--line)}
+.stat:first-child{border-left:0;padding-left:0}
+.stat b{font-family:"Fraunces",serif;font-weight:340;font-size:clamp(2.1rem,4.6vw,3.4rem);line-height:1.05;display:block;font-variant-numeric:tabular-nums}
+.stat span{font-family:"Spline Sans Mono",monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
+.data-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:clamp(1.6rem,4vw,3rem);margin-top:2.7rem}
+.chart{display:flex;align-items:flex-end;gap:6px;height:150px;margin-top:1.1rem;border-bottom:1px solid var(--line);padding-bottom:1px}
+.col{flex:1;height:100%;display:flex;align-items:flex-end;position:relative}
+.bar{width:100%;background:var(--ink);opacity:.15;transition:height .8s cubic-bezier(.2,.7,.2,1),opacity .2s}
+.col:hover .bar{opacity:.35}
+.col.today .bar{background:var(--accent);opacity:1}
+.tip{position:absolute;left:50%;bottom:calc(100% - 14px);transform:translate(-50%,4px);background:var(--ink);color:var(--paper);font-size:.58rem;letter-spacing:.06em;padding:.28rem .5rem;white-space:nowrap;opacity:0;pointer-events:none;transition:.2s;z-index:5}
+.col:hover .tip{opacity:1;transform:translate(-50%,0)}
+.chart-x{display:flex;gap:6px;margin-top:.5rem}
+.chart-x span{flex:1;text-align:center;font-size:.56rem;color:var(--soft)}
+.chart-x .tx{color:var(--accent);font-weight:600}
+.words{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.1rem}
+.wchip{border:1px solid var(--line);background:var(--paper2);padding:.42rem .8rem;font-family:"Spline Sans Mono",monospace;font-size:.72rem}
+.wchip b{color:var(--accent);margin-left:.45rem}
+.dim{color:var(--soft);font-style:italic;font-family:"Fraunces",serif}
+
+/* historial */
+.tabs{display:flex;gap:1.3rem}
+.tab{background:none;border:0;font-family:"Spline Sans Mono",monospace;font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);cursor:pointer;padding:.45rem 0;border-bottom:1px solid transparent;transition:.2s}
+.tab.on{color:var(--ink);border-color:var(--accent)}
+.notice{margin-top:1.6rem;border:1px dashed var(--line);padding:.85rem 1.1rem;display:flex;gap:1.2rem;align-items:center;flex-wrap:wrap;font-size:.85rem;color:var(--soft)}
+.day{margin-top:2.3rem}
+.day-h{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--ink);padding-bottom:.5rem}
+.day-h .dh{font-family:"Spline Sans Mono",monospace;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase}
+.day-h .dc{font-family:"Spline Sans Mono",monospace;font-size:.62rem;color:var(--soft)}
+.action-row{display:grid;grid-template-columns:auto 1fr auto;gap:1.1rem;align-items:center;padding:.95rem .4rem;border-bottom:1px solid var(--line);cursor:pointer;transition:background .2s}
+.action-row:hover{background:var(--paper2)}
+.a-count{font-family:"Spline Sans Mono",monospace;font-size:.64rem;border:1px solid var(--line);padding:.28rem .55rem;color:var(--accent);background:var(--paper2)}
+.a-title{font-family:"Fraunces",serif;font-weight:500;font-size:1.12rem;letter-spacing:-.01em}
+.a-open{font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);opacity:0;margin-left:.7rem;transition:.2s}
+.action-row:hover .a-open{opacity:1}
+.a-poss{color:var(--soft);font-size:.87rem;margin-top:.15rem}
+.empty{padding:2.6rem 0;font-family:"Fraunces",serif;font-style:italic;font-size:1.25rem;color:var(--soft)}
+
+/* pie / toast */
+.foot{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:clamp(3rem,6vw,4.5rem);padding-block:1.8rem 2.4rem}
+.foot p{font-family:"Spline Sans Mono",monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
+.toast{position:fixed;left:50%;bottom:1.4rem;transform:translate(-50%,180%);background:var(--ink);color:var(--paper);padding:.7rem 1.1rem;display:flex;gap:1.1rem;align-items:center;font-size:.85rem;z-index:100;transition:transform .4s cubic-bezier(.2,.7,.2,1)}
+.toast.show{transform:translate(-50%,0)}
+.toast button{background:none;border:0;color:var(--accent-soft);cursor:pointer;font-family:"Spline Sans Mono",monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;text-decoration:underline}
+
+@media(max-width:900px){
+  .tag{display:none}
+  .composer-grid,.data-grid{grid-template-columns:1fr}
+  .now-panel{position:static}
+  .stats{grid-template-columns:repeat(2,1fr);gap:1.2rem 0}
+  .stat:nth-child(3){border-left:0;padding-left:0}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv,.mask>span{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="#">suma<sup>+</sup></a>
+  <span class="tag mono" id="tagline" data-txt="el lado bueno de tus acciones">el lado bueno de tus acciones</span>
+  <div class="top-right">
+    <span class="today mono" id="todayLabel"></span>
+    <span class="pill mono" id="pill"><b id="pillCount">0</b> lados buenos</span>
+    <button class="linkbtn" id="exportBtn">exportar</button>
+  </div>
+</header>
+
+<main>
+  <!-- 01 · escribir -->
+  <section class="wrap" id="composerSec">
+    <p class="kicker"><span class="n">01</span>escribe</p>
+    <h1 class="display">
+      <span class="mask"><span>Toda acción tiene</span></span>
+      <span class="mask"><span>un <em>lado bueno</em>.</span></span>
+    </h1>
+
+    <div class="composer-grid">
+      <div class="flow">
+        <!-- paso A: la acción -->
+        <div id="stepAction">
+          <p class="kicker" style="margin-top:2.4rem">la acción</p>
+          <div class="bigrow">
+            <input class="big" id="actionInput" maxlength="120" autocomplete="off"
+                   placeholder="p. ej. salí a caminar 20 min…" aria-label="describe la acción">
+            <button class="round" data-go="action" aria-label="continuar">→</button>
+          </div>
+          <p class="hint mono">⏎ para empezar a sumar lo bueno</p>
+        </div>
+
+        <!-- paso B: los lados buenos -->
+        <div id="stepPositive" hidden>
+          <p class="kicker" style="margin-top:2.4rem">estás sumando a</p>
+          <p class="action-title" id="actionTitle"></p>
+          <div class="bigrow" id="posRow">
+            <input class="big" id="posInput" maxlength="140" autocomplete="off"
+                   placeholder="algo bueno que te dejó… ⏎" aria-label="añade un lado bueno">
+            <button class="round" data-go="positive" aria-label="añadir">+</button>
+          </div>
+          <p class="hint mono">⏎ sumar · esc cerrar la acción</p>
+          <div class="sugg" id="suggRow"></div>
+          <ol class="plist" id="liveList"></ol>
+          <button class="linkbtn" id="closeAction">✓ cerrar acción</button>
+        </div>
+      </div>
+
+      <aside class="now-panel rv">
+        <p class="kicker">ahora</p>
+        <div class="bignum" id="nowCount">00</div>
+        <p class="now-cap mono" id="nowCap">lados buenos<br>de esta acción</p>
+        <div class="now-meta">
+          <div><b id="streakNow">0</b><span>días de racha</span></div>
+          <div><b id="todayNow">0</b><span>hoy</span></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- 02 · datos -->
+  <section class="wrap rv" id="datosSec">
+    <div class="sec-head">
+      <p class="kicker"><span class="n">02</span>tus datos</p>
+      <h2 class="sec-title">lo que llevas sumado</h2>
+    </div>
+    <div class="stats" id="statsRow">
+      <div class="stat"><b id="stTotal" data-cur="0">0</b><span>lados buenos</span></div>
+      <div class="stat"><b id="stActions" data-cur="0">0</b><span>acciones</span></div>
+      <div class="stat"><b id="stStreak" data-cur="0">0</b><span>racha · días</span></div>
+      <div class="stat"><b id="stBest" data-cur="0">0</b><span>récord diario</span></div>
+    </div>
+    <div class="data-grid">
+      <div>
+        <p class="kicker">últimos 14 días</p>
+        <div class="chart" id="chart"></div>
+        <div class="chart-x" id="chartX"></div>
+      </div>
+      <div>
+        <p class="kicker">lo que más se repite</p>
+        <div class="words" id="words"></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- 03 · historial -->
+  <section class="wrap rv" id="histSec">
+    <div class="sec-head between">
+      <div>
+        <p class="kicker"><span class="n">03</span>historial</p>
+        <h2 class="sec-title">cada acción, con sus lados buenos</h2>
+      </div>
+      <div class="tabs" role="tablist">
+        <button class="tab on" data-f="all">todo</button>
+        <button class="tab" data-f="today">hoy</button>
+        <button class="tab" data-f="week">7 días</button>
+      </div>
+    </div>
+    <div class="notice" id="demoNotice" hidden>
+      <span>estos registros son de ejemplo para que veas cómo funciona.</span>
+      <button class="linkbtn" id="delDemos">borrar ejemplos</button>
+    </div>
+    <div id="history"></div>
+  </section>
+</main>
+
+<footer class="wrap foot">
+  <p>tus datos viven solo en este navegador · localStorage</p>
+  <p>⏎ sumar&nbsp;&nbsp;·&nbsp;&nbsp;esc cerrar&nbsp;&nbsp;·&nbsp;&nbsp;toca una acción para seguir sumándole</p>
+  <button class="linkbtn warn" id="resetAll">empezar de cero</button>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <span id="toastMsg"></span><button id="toastUndo" hidden>deshacer</button>
+</div>
+
+<script>
+/* ─── estado ─────────────────────────────────── */
+const LS='suma.v1', D=864e5, RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9);
+const dayKey=ts=>{const d=new Date(ts);return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};
+const pad=n=>String(n).padStart(2,'0');
+
+function seed(){
+  const now=Date.now();
+  const mk=(title,poss,ago)=>({id:uid(),demo:true,ts:now-ago*D+9*36e5,title,
+    positives:poss.map((t,i)=>({id:uid(),text:t,ts:now-ago*D+(9+i)*36e5}))});
+  return {actions:[
+    mk('caminata de 20 min al sol',['más energía toda la mañana','cabeza más clara'],0),
+    mk('llamé a mi madre',['buena conversación','me sentió cerca y yo también'],1),
+    mk('terminé el informe pendiente',['alivio inmediato','una tarde libre','avance real'],2)
+  ]};
+}
+function load(){try{return JSON.parse(localStorage.getItem(LS))}catch{return null}}
+let db=load(); if(!db){db=seed();save()}
+let currentId=null, filter='all', undoData=null, toastTimer=null, chartSeen=false, statsShown=false;
+function save(){localStorage.setItem(LS,JSON.stringify(db))}
+
+/* ─── derivados ──────────────────────────────── */
+const allPos=()=>db.actions.flatMap(a=>a.positives);
+const totalPos=()=>allPos().length;
+const todayCount=()=>allPos().filter(p=>dayKey(p.ts)===dayKey(Date.now())).length;
+function streak(){
+  const days=new Set(allPos().map(p=>dayKey(p.ts))); let n=0,t=Date.now();
+  if(!days.has(dayKey(t))) t-=D;
+  while(days.has(dayKey(t))){n++;t-=D} return n;
+}
+function bestDay(){const m={};allPos().forEach(p=>m[dayKey(p.ts)]=(m[dayKey(p.ts)]||0)+1);return Math.max(0,...Object.values(m))}
+function dayCounts(n){
+  const out=[]; for(let i=n-1;i>=0;i--){const t=Date.now()-i*D;
+    out.push({ts:t,n:allPos().filter(p=>dayKey(p.ts)===dayKey(t)).length})} return out;
+}
+function dayLabel(ts){
+  const k=dayKey(ts), kn=dayKey(Date.now()), ky=dayKey(Date.now()-D);
+  if(k===kn)return'hoy'; if(k===ky)return'ayer';
+  const d=new Date(ts);
+  return d.toLocaleDateString('es-ES',{weekday:'long'})+' · '+d.toLocaleDateString('es-ES',{day:'numeric',month:'short'});
+}
+
+/* ─── animaciones utilitarias ────────────────── */
+function countUp(el,to,dur=700){
+  const from=+el.dataset.cur||0;
+  if(from===to){el.textContent=to;return}
+  if(RM){el.textContent=to;el.dataset.cur=to;return}
+  const t0=performance.now();
+  (function step(t){const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,3);
+    el.textContent=Math.round(from+(to-from)*e);
+    p<1?requestAnimationFrame(step):el.dataset.cur=to})(t0);
+}
+function scramble(el){
+  if(RM)return; const fin=el.dataset.txt||el.textContent, chars='+·×—▪';
+  let i=0; const iv=setInterval(()=>{
+    el.textContent=fin.split('').map((c,j)=>(c===' '||j>=i)?c:chars[(Math.random()*chars.length)|0]).join('');
+    i++; if(i>fin.length){clearInterval(iv);el.textContent=fin}
+  },28);
+}
+
+/* ─── toast ──────────────────────────────────── */
+function toast(msg,undo,undoFn){
+  clearTimeout(toastTimer);
+  $('toastMsg').textContent=msg;
+  const u=$('toastUndo'); u.hidden=!undo; u.onclick=()=>{undoFn&&undoFn();hideToast()};
+  $('toast').classList.add('show');
+  toastTimer=setTimeout(hideToast,4200);
+}
+function hideToast(){$('toast').classList.remove('show');$('toastUndo').hidden=true}
+
+/* ─── compositor ─────────────────────────────── */
+const SUGG=['claro que sí','esto cuenta','más tiempo del que parece','un respiro','esto también fue bueno',
+  'me sentí útil','algo que aprender','una pausa','soy más fuerte','hoy alcanzó'];
+function openComposer(id){
+  const a=db.actions.find(a=>a.id===id)||null;
+  currentId=id;
+  $('stepAction').hidden=true; $('stepPositive').hidden=false;
+  $('actionTitle').textContent=a?esc(a.title):'';
+  renderLive(); renderSugg(); $('posInput').focus();
+  $('nowCap').innerHTML=a&&a.positives.length?('lados buenos<br>de «'+esc(a.title.slice(0,22))+'…»'):'lados buenos<br>de esta acción';
+  $('nowCount').textContent=pad(a?a.positives.length:0);
+}
+function closeComposer(){
+  if(currentId){const a=db.actions.find(a=>a.id===currentId);
+    if(a&&!a.positives.length)db.actions=db.actions.filter(x=>x.id!==currentId)}
+  currentId=null;
+  $('stepPositive').hidden=true; $('stepAction').hidden=false;
+  $('actionInput').value=''; $('actionInput').focus();
+  $('nowCap').innerHTML='lados buenos<br>de esta acción';
+  $('nowCount').textContent='00';
+  save(); renderAll();
+}
+function addPositive(){
+  const v=$('posInput').value.trim(); if(!v||!currentId)return;
+  const a=db.actions.find(a=>a.id===currentId); if(!a)return;
+  a.positives.push({id:uid(),text:v,ts:Date.now()});
+  $('posInput').value='';
+  renderLive(); renderSugg();
+  $('nowCount').textContent=pad(a.positives.length);
+  $('nowCount').classList.add('tick'); setTimeout(()=>$('nowCount').classList.remove('tick'),450);
+  const row=$('posRow');
+  const f=document.createElement('span'); f.className='f1'; f.textContent='+1'; row.appendChild(f);
+  setTimeout(()=>f.remove(),950);
+  save(); renderStats();
+}
+function delPositive(pid){
+  const a=db.actions.find(a=>a.id===currentId); if(!a)return;
+  const p=a.positives.find(p=>p.id===pid);
+  a.positives=a.positives.filter(p=>p.id!==pid);
+  renderLive(); $('nowCount').textContent=pad(a.positives.length);
+  undoData={type:'positive',actionId:currentId,item:p};
+  toast('lado bueno quitado',true,undo);
+  save(); renderStats();
+}
+function renderLive(){
+  const a=db.actions.find(a=>a.id===currentId);
+  $('liveList').innerHTML=(a?a.positives:[]).map((p,i)=>
+    `<li><span class="idx mono">${pad(i+1)}</span><span class="txt">${esc(p.text)}</span>
+     <button class="x" data-del="${p.id}" aria-label="quitar">✕</button></li>`).join('');
+}
+function renderSugg(){
+  const a=db.actions.find(a=>a.id===currentId);
+  const used=new Set(a?a.positives.map(p=>p.text):[]);
+  const cand=SUGG.filter(s=>!used.has(s)).slice(0,4);
+  $('suggRow').innerHTML=`<span class="s-label mono">sugerencias</span>`+
+    cand.map(s=>`<button class="chip" data-sugg="${esc(s)}">${esc(s)}</button>`).join('');
+}
+$('suggRow').addEventListener('click',e=>{
+  if(e.target.dataset.sugg){$('posInput').value=e.target.dataset.sugg;addPositive()}
+});
+$('liveList').addEventListener('click',e=>{
+  if(e.target.dataset.del)delPositive(e.target.dataset.del)
+});
+
+/* ─── historial ──────────────────────────────── */
+function renderHistory(){
+  const el=$('history');
+  let acts=db.actions.slice().sort((a,b)=>b.ts-a.ts);
+  const nowKey=dayKey(Date.now());
+  if(filter==='today')acts=acts.filter(a=>dayKey(a.ts)===nowKey);
+  if(filter==='week')acts=acts.filter(a=>Date.now()-a.ts<7*D);
+  if(!acts.length){el.innerHTML=`<div class="empty">todavía no hay nada sumado aquí.</div>`;return}
+  const days=new Map();
+  acts.forEach(a=>{const k=dayKey(a.ts);if(!days.has(k))days.set(k,[]);days.get(k).push(a)});
+  let html='';
+  for(const[k,list]of days){
+    html+=`<div class="day"><div class="day-h">
+      <span class="dh">${esc(dayLabel(list[0].ts))}</span>
+      <span class="dc">${list.length} accion${list.length!==1?'es':''}</span></div>`;
+    list.forEach(a=>{
+      const count=a.positives.length;
+      html+=`<div class="action-row" data-open="${a.id}">
+        <span class="a-count">${count}</span>
+        <div><div class="a-title">${esc(a.title)}<span class="a-open">sumar más</span></div>
+        ${a.positives.length?`<div class="a-poss">${a.positives.map(p=>esc(p.text)).join(' · ')}</div>`:''}</div>
+        <button class="x" data-delact="${a.id}" aria-label="borrar acción">✕</button></div>`;
+    });
+    html+=`</div>`;
+  }
+  el.innerHTML=html;
+  el.onclick=e=>{
+    const del=e.target.dataset.delact;
+    if(del){
+      e.stopPropagation();
+      const a=db.actions.find(a=>a.id===del);
+      if(a){db.actions=db.actions.filter(a=>a.id!==del);
+        undoData={type:'action',item:a};
+        toast('acción borrada',true,undo);save();renderAll()}
+      return;
+    }
+    const row=e.target.closest('[data-open]');
+    if(row)openComposer(row.dataset.open);
+  };
+}
+function undo(){
+  if(!undoData)return; const u=undoData; undoData=null;
+  if(u.type==='positive'){
+    const a=db.actions.find(a=>a.id===u.actionId);
+    if(a)a.positives.push(u.item);
+  }else db.actions.push(u.item);
+  save(); renderAll();
+  if(currentId){renderLive();renderSugg()}
+}
+
+/* ─── datos / gráfico / palabras ─────────────── */
+function renderChart(){
+  const days=dayCounts(14), max=Math.max(1,...days.map(d=>d.n));
+  const kn=dayKey(Date.now());
+  $('chart').innerHTML=days.map(d=>{
+    const h=Math.round(d.n/max*100);
+    return `<div class="col${dayKey(d.ts)===kn?' today':''}">
+      <div class="tip mono">${d.n}</div><div class="bar" style="height:${d.n?h:2}%"></div></div>`;
+  }).join('');
+  $('chartX').innerHTML=days.map((d,i)=>{
+    const t=d.ts,cl=dayKey(t)===kn?'tx':'';
+    if(i%2===1||dayKey(t)===kn)return`<span class="${cl}">${dayKey(t)===kn?'hoy':''}</span>`;
+    const k=new Date(t);
+    return`<span>${k.getDate()}</span>`;
+  }).join('');
+}
+function renderWords(){
+  const stop=new Set(['de','la','el','los','las','un','una','y','que','me','mi','más','por','con','en','lo','al','del','no','se','a','para','todo','muy']);
+  const freq={}; allPos().forEach(p=>p.text.toLowerCase().split(/[^a-záéíóúñü]+/).forEach(w=>{
+    if(w.length>3&&!stop.has(w))freq[w]=(freq[w]||0)+1}));
+  const top=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  $('words').innerHTML=top.length?top.map(([w,n])=>`<span class="wchip">${esc(w)}<b>×${n}</b></span>`).join('')
+    :`<span class="dim">todavía poco para leer…</span>`;
+}
+function renderStats(){
+  $('stTotal')&&(countUp($('stTotal'),totalPos()));
+  $('stActions')&&(countUp($('stActions'),db.actions.length));
+  $('stStreak')&&(countUp($('stStreak'),streak()));
+  $('stBest')&&(countUp($('stBest'),bestDay()));
+  $('pillCount').textContent=totalPos();
+  $('streakNow').textContent=streak();
+  $('todayNow').textContent=todayCount();
+}
+
+/* ─── revelado al hacer scroll ───────────────── */
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){
+    e.target.classList.add('in');
+    if(e.target.id==='datosSec'&&!statsShown){statsShown=true;renderStats()}
+    if(e.target.id==='histSec')renderHistory();
+    io.unobserve(e.target);
+  }
+}),{threshold:.18});
+$('datosSec')&&io.observe($('datosSec'));
+$('histSec')&&io.observe($('histSec'));
+$('.now-panel')&&setTimeout(()=>$('.now-panel').classList.add('in'),250);
+
+function renderAll(){
+  renderStats(); renderChart(); renderWords();
+  if(!$('datosSec').classList.contains('in')){renderStats()}
+  $('demoNotice').hidden=!db.actions.some(a=>a.demo);
+}
+document.querySelectorAll('.mask').forEach(m=>setTimeout(()=>m.classList.add('in'),80));
+requestAnimationFrame(scramble.bind(null,$('tagline')));
+
+/* ─── eventos ────────────────────────────────── */
+$('actionInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    e.preventDefault();
+    const v=$('actionInput').value.trim(); if(!v)return;
+    const a={id:uid(),demo:false,ts:Date.now(),title:v,positives:[]};
+    db.actions.push(a); save();
+    openComposer(a.id);
+  }
+});
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{
+  const g=b.dataset.go;
+  if(g==='action')$('actionInput').dispatchEvent(new KeyboardEvent('keydown',{key:'Enter'}));
+  if(g==='positive')addPositive();
+}));
+$('posInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){e.preventDefault();addPositive()}
+  if(e.key==='Escape')closeComposer();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&!$('stepAction').hidden)closeComposer();
+});
+$('closeAction').addEventListener('click',closeComposer);
+$('history').addEventListener('click',()=>{});
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on'); filter=t.dataset.f; renderHistory();
+}));
+$('exportBtn').addEventListener('click',()=>{
+  const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='suma-export-'+dayKey(Date.now())+'.json';
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('exportado a json');
+});
+$('delDemos').addEventListener('click',()=>{
+  const had=db.actions.filter(a=>a.demo).length;
+  db.actions=db.actions.filter(a=>!a.demo);
+  save(); renderAll(); renderHistory();
+  toast(had?`borrados ${had} ejemplos`:'no había ejemplos');
+});
+$('resetAll').addEventListener('click',()=>{
+  undoData={type:'all',item:db}; db={actions:[]}; save(); renderAll(); renderHistory();
+  toast('empezaste de cero',true,()=>{db=undoData.item;undoData=null;save();renderAll();renderHistory()});
+});
+
+/* ─── fecha de hoy ───────────────────────────── */
+function fmtToday(){
+  const d=new Date();
+  return d.toLocaleDateString('es-ES',{weekday:'short'})+'. '+pad(d.getDate())+' '+
+    d.toLocaleDateString('es-ES',{month:'short'}).replace('.','');
+}
+$('todayLabel').textContent=fmtToday();
+setInterval(()=>{if(dayKey(Date.now())!==dayKey(Date.now()-1000))renderAll()},3600e3);
+
+/* ─── arranque ───────────────────────────────── */
+renderAll(); renderHistory();
+if(currentId)openComposer(currentId);
+</script>
+</body>
+</html>
