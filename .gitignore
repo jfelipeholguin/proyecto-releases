@@ -1,0 +1,22 @@
+# Build
+app/build/
+build/
+*.apk
+*.aab
+*.aar
+
+# Gradle
+.gradle/
+gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local config
+local.properties
