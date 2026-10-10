@@ -259,6 +259,18 @@ function shift(d){
 }
 
 
+/* ================= SWIPE PARA CAMBIAR DE DÍA ================= */
+(function(){
+  let x0=null,y0=null;
+  document.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
+  document.addEventListener('touchend',e=>{
+    if(x0==null)return;
+    const dx=e.changedTouches[0].clientX-x0, dy=e.changedTouches[0].clientY-y0;
+    if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*2)shift(dx<0?1:-1);
+    x0=null;y0=null;
+  },{passive:true});
+})();
+
 /* ================= CARGA DE DATOS ================= */
 function setSource(mode){ source=mode; }
 
@@ -281,6 +293,14 @@ async function loadData(forceLive){
   render();
 }
 loadData(false);
+/* refresco en vivo: línea de hora + fecha cada 30s */
+setInterval(()=>{
+  if(selected===dayKey(Date.now())){
+    const t=document.getElementById('timeline');
+    if(t&&!t.hidden&&byDay.has(selected)){render();}else{render();}
+    document.getElementById('dayName').textContent=fmtKey(selected);
+  }
+},30000);
 </script>
 </body>
 </html>
