@@ -7,6 +7,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -98,6 +99,11 @@ fun WebViewHost(
     onLoadError: () -> Unit
 ) {
     var canGoBack by remember { mutableStateOf(false) }
+    var webViewRef by remember { mutableStateOf<WebView?>(null) }
+
+    BackHandler(enabled = canGoBack) {
+        webViewRef?.goBack()
+    }
 
     AndroidView(
         modifier = modifier,
@@ -114,6 +120,9 @@ fun WebViewHost(
                     override fun onPageFinished(view: WebView?, url: String?) {
                         canGoBack = view?.canGoBack() ?: false
                     }
+                    override fun doUpdateVisitedHistory(view: WebView?, url: String?, isReload: Boolean) {
+                        canGoBack = view?.canGoBack() ?: false
+                    }
                     override fun onReceivedError(
                         view: WebView?,
                         request: WebResourceRequest?,
@@ -125,7 +134,7 @@ fun WebViewHost(
                 loadUrl("file:///android_asset/launcher.html")
             }
         },
-        update = { webView -> }
+        update = { webView -> webViewRef = webView }
     )
 }
 
