@@ -67,14 +67,7 @@ fun ProyectoContent() {
     var showError by remember { mutableStateOf(false) }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Proyecto") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
-            )
-        },
+        topBar = {},
         modifier = Modifier.fillMaxSize()
     ) { padding ->
         if (showError) {
