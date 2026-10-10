@@ -258,14 +258,7 @@ document.addEventListener('keydown',e=>{
 });
 
 /* ================= CARGA DE DATOS ================= */
-function setSource(mode){
-  source=mode;
-  const el=$('src');
-  el.classList.toggle('live',mode==='live');
-  $('srcTxt').textContent=mode==='live'
-    ?'Fuente: ICS en vivo · actualizado '+new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})
-    :'Fuente: datos embebidos (sin conexión con el ICS)';
-}
+function setSource(mode){ source=mode; }
 
 async function loadData(forceLive){
   const forceEmbed=!forceLive&&new URLSearchParams(location.search).has('embed');
@@ -285,8 +278,6 @@ async function loadData(forceLive){
   if(!byDay.has(selected))selected=dayKey(Date.now());
   render();
 }
-$('refresh').addEventListener('click',()=>{$('srcTxt').textContent='Actualizando…';loadData(true)});
-
 loadData(false);
 </script>
 </body>
