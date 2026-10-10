@@ -213,7 +213,9 @@ function buildBlocks(events){
 /* ================= RENDER ================= */
 function render(){
   $('dayName').textContent=fmtKey(selected);
-  $('todayBadge').classList.toggle('on',selected===dayKey(Date.now()));
+  const isToday=selected===dayKey(Date.now());
+  $('todayBadge').classList.toggle('on',isToday);
+  $('goToday').style.display=isToday?'none':'';
 
   const events=byDay.get(selected)||[];
   const hasQueue=events.some(e=>e.summary==='En la cola');
