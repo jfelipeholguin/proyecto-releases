@@ -450,6 +450,7 @@ h1 .word{font-style:italic;font-weight:400}
     <button class="btn" id="goToday">Hoy</button>
     <button class="btn" id="addEvt">+ Agregar</button>
   </div>
+  <p class="daylabel" id="sleepLive" hidden></p>
 
   <div class="timeline" id="timeline" hidden></div>
   <div class="empty" id="empty"><b id="emptyTitle">Sin turno</b><span id="emptyMsg"></span></div>
@@ -647,6 +648,35 @@ function buildDerived(){
   for(const arr of derivedByDay.values())arr.sort((a,b)=>a.start-b.start);
 }
 
+/* ================= SUEÑO EN CURSO ================= */
+// ms epoch. Devuelve el evento Dormir vivo a nowMs, o null.
+function findLiveSleep(nowMs){
+  for(const arr of derivedByDay.values()){
+    const d=arr.find(e=>e.summary==='Dormir'&&e.start<=nowMs&&nowMs<e.end);
+    if(d)return d;
+  }
+  return null;
+}
+// Texto puro: solo el valor restante = despertar − ahora (== total − transcurrido).
+function sleepLiveText(nowMs,sleepStart,wakeMs){
+  if(!(sleepStart<=nowMs&&nowMs<wakeMs))return '';
+  return fmtDur(Math.ceil((wakeMs-nowMs)/60000));
+}
+function paintSleepLive(){
+  const el=document.getElementById('sleepLive');
+  if(!el)return;
+  let txt='';
+  if(selected===dayKey(Date.now())){
+    const d=findLiveSleep(Date.now());
+    if(d){
+      txt=sleepLiveText(Date.now(),d.start,d.end);
+      el.title='Despiertas '+fmtHM(d.end)+' · dormido '+fmtDur(Math.floor((Date.now()-d.start)/60000));
+    }
+  }
+  el.textContent=txt;
+  el.hidden=!txt;
+}
+
 /* ================= LÍNEA DE AHORA ================= */
 // nowMs/startMs/endMs en epoch ms. Devuelve px desde el top del contenedor.
 function getNowTop(nowMs, startMs, endMs, containerHeight) {
@@ -654,6 +684,7 @@ function getNowTop(nowMs, startMs, endMs, containerHeight) {
 }
 const NOW_C=2*Math.PI*5.5;
 function placeNowLine(){
+  paintSleepLive();
   let line=document.getElementById('nowline');
   const tl=$('timeline');
   if(tl.hidden||selected!==dayKey(Date.now())){if(line)line.hidden=true;return}
@@ -803,6 +834,16 @@ document.addEventListener('keydown',e=>{
 })();
 
 /* ================= CARGA DE DATOS ================= */
+const ICS_CACHE_KEY='turno-ics-cache';
+function saveICSCache(text){
+  try{localStorage.setItem(ICS_CACHE_KEY,JSON.stringify({t:Date.now(),ics:String(text)}));}catch(err){}
+}
+function readICSCache(){
+  try{
+    const o=JSON.parse(localStorage.getItem(ICS_CACHE_KEY)||'null');
+    return o&&typeof o.ics==='string'&&o.ics?o.ics:null;
+  }catch(err){return null}
+}
 async function loadData(forceLive){
   const forceEmbed=!forceLive&&new URLSearchParams(location.search).has('embed');
   if(!forceEmbed){
@@ -812,10 +853,17 @@ async function loadData(forceLive){
       const res=await fetch(ICS_URL,{signal:ctrl.signal});
       clearTimeout(timer);
       if(!res.ok)throw new Error('HTTP '+res.status);
-      const events=parseICS(await res.text());
+      const raw=await res.text();
+      const events=parseICS(raw);
       if(!events.length)throw new Error('ICS vacío');
+      saveICSCache(raw);
       indexEvents(events);buildDerived();render();return;
-    }catch(err){console.warn('ICS en vivo no disponible, usando datos embebidos:',err)}
+    }catch(err){console.warn('ICS en vivo no disponible:',err)}
+    try{
+      const cached=readICSCache();
+      const events=cached?parseICS(cached):[];
+      if(events.length){indexEvents(events);buildDerived();render();return}
+    }catch(err){console.warn('Caché ICS inválido:',err)}
   }
   indexEvents(EMBEDDED);
   buildDerived();
