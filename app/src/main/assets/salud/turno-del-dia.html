@@ -361,8 +361,7 @@ h1 .word{font-style:italic;font-weight:400}
     border: 1px solid #e8e8ed; background: #fff; color: #1d1d1f;
   }
 #mrt .mini-btn.primary { background: #1d1d1f; border-color: #1d1d1f; color: #fff; }
-#mrt /* DIETA (D1 FIX) */
-  .card .value.warn { color: #8a4b00; }
+#mrt .card .value.warn { color: #8a4b00; }
 #mrt .chip.on { background: #1d1d1f; color: #fff; }
 #mrt .tab.on .overlay { background: rgba(29, 29, 31, 0.1); transform: scale(1); }
 #mrt .ev-trigger {
@@ -373,8 +372,7 @@ h1 .word{font-style:italic;font-weight:400}
   }
 #mrt .ev-trigger:hover { background: #f5f5f5; color: #171717; }
 #mrt .ev-trigger svg { width: 16px; height: 16px; }
-#mrt /* MENÚ DE ACCIONES */
-  .ev-menu {
+#mrt .ev-menu {
     position: fixed; z-index: 50; min-width: 230px;
     background: #fff; border: 1px solid #e8e8ed; border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.12);
@@ -398,7 +396,6 @@ h1 .word{font-style:italic;font-weight:400}
     color: #86868b; transition: transform 0.2s; font-size: 11px;
   }
 #mrt ul.list li.expand-li details[open] summary .chev { transform: rotate(90deg); }
-#mrt /* ===== Mi Ruta (fusionado de app.css, acotado al panel) ===== */
 #mrt {
   --bg: #ffffff;
   --surface: #ffffff;
@@ -439,7 +436,6 @@ h1 .word{font-style:italic;font-weight:400}
 #mrt .muted { color: var(--text-muted); }
 #mrt .small { font-size: 0.8rem; }
 #mrt .error { color: var(--expense); font-size: 0.85rem; font-weight: 600; }
-/* ---------- cuentas ---------- */
 #mrt .accounts-section { margin-bottom: 24px; }
 #mrt .accounts-toggle {
   display: flex; align-items: center; gap: 6px;
@@ -486,7 +482,6 @@ h1 .word{font-style:italic;font-weight:400}
 }
 #mrt .acc-add:hover { background: rgba(255, 255, 255, 0.7); border-color: var(--accent); }
 #mrt .acc-add span { font-size: 1.5rem; font-weight: 700; color: var(--text-muted); }
-/* ---------- panorama ---------- */
 #mrt .panorama {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 4px 10px; border-radius: 9999px;
@@ -501,7 +496,6 @@ h1 .word{font-style:italic;font-weight:400}
 #mrt .panorama.ok .panorama-dot { background: #10b981; }
 #mrt .panorama.bad .panorama-dot { background: #f43f5f; }
 #mrt .panorama-arrow { opacity: 0.6; font-size: 0.6rem; }
-/* ---------- separadores de mes ---------- */
 #mrt .month-separator {
   display: flex; align-items: center;
   margin: 40px 0 20px;
@@ -512,7 +506,6 @@ h1 .word{font-style:italic;font-weight:400}
 #mrt .month-separator::after {
   content: ""; flex: 1; height: 1px; background-color: var(--separator); margin-left: 10px;
 }
-/* ---------- timeline ---------- */
 #mrt .timeline-row {
   display: grid; grid-template-columns: 48px 1fr 88px;
   gap: 10px; align-items: center; margin-bottom: 8px;
@@ -533,7 +526,6 @@ h1 .word{font-style:italic;font-weight:400}
 #mrt .t-bal.neg { color: #ef4444; opacity: 1; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 #mrt .t-bal.min { color: #ef4444; opacity: 1; }
 #mrt .t-min-badge { font-size: 0.6rem; font-weight: 900; color: #dc2626; background: #fee2e2; border-radius: 6px; padding: 1px 5px; }
-/* ---------- tarjetas de evento ---------- */
 #mrt .event-card {
   display: flex; justify-content: flex-start; align-items: center; gap: 12px;
   min-width: 0; width: fit-content; max-width: 100%;
@@ -558,24 +550,23 @@ h1 .word{font-style:italic;font-weight:400}
 #mrt .ev-amount.inc { color: var(--income); }
 #mrt .ev-amount.exp { color: var(--expense); }
 #mrt .ev-amount.silenced { color: #a3a3a3; text-decoration: line-through; opacity: 0.6; }
-#mrt .badge {
+#mrt .mrt-badge {
   display: inline-block; font-size: 0.45rem; font-weight: 800;
   padding: 2px 6px; border-radius: 6px;
   text-transform: uppercase; letter-spacing: -0.05em;
   white-space: nowrap; flex-shrink: 0;
 }
-#mrt .badge.sleep { background: #eef2ff; color: #6366f1; font-weight: 700; }
-#mrt .badge.rec-inc { background: #f0fdf4; color: var(--income); font-weight: 900; opacity: 0; transition: opacity 0.15s; }
-#mrt .badge.rec-exp { background: #fef2f2; color: var(--expense); font-weight: 900; opacity: 0; transition: opacity 0.15s; }
-#mrt .badge.varb { border: 1px dotted #22c55e; color: var(--income); font-weight: 900; opacity: 0; transition: opacity 0.15s; }
-#mrt .event-card:hover .badge.rec-inc, #mrt .event-card:hover .badge.rec-exp, #mrt .event-card:hover .badge.varb { opacity: 1; }
-#mrt .badge.warn { background: #fee2e2; color: #dc2626; font-weight: 900; }
-#mrt .badge.cred { background: rgba(156, 220, 254, 0.2); color: #9cdcfe; font-weight: 900; }
-#mrt .badge.cnt { background: rgba(0, 113, 227, 0.1); color: var(--accent); font-weight: 900; }
-#mrt .badge.adjust { background: #f5f5f5; color: #171717; font-weight: 700; border: 0; cursor: pointer; font-family: inherit; }
-#mrt .badge.adjust:hover { background: #e5e5e5; }
+#mrt .mrt-badge.sleep { background: #eef2ff; color: #6366f1; font-weight: 700; }
+#mrt .mrt-badge.rec-inc { background: #f0fdf4; color: var(--income); font-weight: 900; opacity: 0; transition: opacity 0.15s; }
+#mrt .mrt-badge.rec-exp { background: #fef2f2; color: var(--expense); font-weight: 900; opacity: 0; transition: opacity 0.15s; }
+#mrt .mrt-badge.varb { border: 1px dotted #22c55e; color: var(--income); font-weight: 900; opacity: 0; transition: opacity 0.15s; }
+#mrt .event-card:hover .mrt-badge.rec-inc, #mrt .event-card:hover .mrt-badge.rec-exp, #mrt .event-card:hover .mrt-badge.varb { opacity: 1; }
+#mrt .mrt-badge.warn { background: #fee2e2; color: #dc2626; font-weight: 900; }
+#mrt .mrt-badge.cred { background: rgba(156, 220, 254, 0.2); color: #9cdcfe; font-weight: 900; }
+#mrt .mrt-badge.cnt { background: rgba(0, 113, 227, 0.1); color: var(--accent); font-weight: 900; }
+#mrt .mrt-badge.adjust { background: #f5f5f5; color: #171717; font-weight: 700; border: 0; cursor: pointer; font-family: inherit; }
+#mrt .mrt-badge.adjust:hover { background: #e5e5e5; }
 #mrt .payline { font-size: 0.5rem; color: var(--text-muted); opacity: 0.5; }
-/* ---------- menú de evento ---------- */
 #mrt .ev-menu-wrap { position: relative; flex-shrink: 0; }
 #mrt .ev-trigger {
   width: 28px; height: 28px; border-radius: 50%; border: 0; padding: 0;
@@ -605,7 +596,6 @@ h1 .word{font-style:italic;font-weight:400}
 #mrt .ev-item.danger { color: #dc2626; }
 #mrt .ev-item.danger:hover { background: #fef2f2; }
 #mrt .ev-sep { height: 1px; background: #f5f5f5; margin: 4px 0; }
-/* ---------- detalle agregado ---------- */
 #mrt .agg-detail { margin-top: 8px; border-top: 1px solid var(--separator); padding-top: 8px; display: flex; flex-direction: column; gap: 6px; }
 #mrt .agg-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
 #mrt .agg-item span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 8px; }
@@ -616,7 +606,6 @@ h1 .word{font-style:italic;font-weight:400}
   cursor: pointer; margin-left: 8px; flex-shrink: 0; line-height: 1;
 }
 #mrt .delete-btn:hover { background: var(--expense); color: #fff; }
-/* ---------- acciones superiores ---------- */
 #mrt .topbar {
   position: sticky; top: 0; z-index: 40;
   display: flex; align-items: center; gap: 8px; padding: 12px 0;
@@ -627,7 +616,6 @@ h1 .word{font-style:italic;font-weight:400}
 #mrt .topbar #mrt-accountsToggle { flex: none; }
 #mrt .topbar #mrt-panoramaBtn { margin-left: auto; min-width: 0; }
 #mrt .topbar #mrt-panoramaText { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-/* ---------- modales ---------- */
 #mrt .modal-overlay {
   position: fixed; inset: 0; background: var(--overlay);
   display: flex; justify-content: center; align-items: center; z-index: 1000;
@@ -673,14 +661,12 @@ h1 .word{font-style:italic;font-weight:400}
   text-align: center; color: var(--text-muted);
   padding: 40px 20px; font-size: 0.95rem;
 }
-/* ---------- animaciones ---------- */
 #mrt @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
 @media (prefers-reduced-motion: reduce) {#mrt .t-bal.neg, #mrt .panorama.bad { animation: none; }
 #mrt .modal-content { animation: none; }}
-/* ---------- pantallas angostas ---------- */
 #mrt @media (max-width: 700px) {
   .container { padding: 16px 12px 96px; }
   .timeline { overflow-x: auto; }
@@ -694,8 +680,7 @@ h1 .word{font-style:italic;font-weight:400}
 #mrt .form-row { flex-direction: column; gap: 0; }
 #mrt .event-card { padding: 10px 12px; }}
 @media (hover: none) {#mrt .ev-trigger { opacity: 1; }
-#mrt .badge.rec-inc, #mrt .badge.rec-exp, #mrt .badge.varb { opacity: 1; }}
-/* ---------- nueva jugada ---------- */
+#mrt .mrt-badge.rec-inc, #mrt .mrt-badge.rec-exp, #mrt .mrt-badge.varb { opacity: 1; }}
 #mrt .nj-overlay { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.5); padding: 16px; }
 #mrt .nj-overlay[hidden] { display: none; }
 #mrt .nj-form { width: 100%; max-width: 448px; background: #fff; border: 1px solid #e5e5e5; border-radius: 24px; padding: 28px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); max-height: 92vh; overflow-y: auto; }
@@ -753,7 +738,6 @@ h1 .word{font-style:italic;font-weight:400}
 #mrt .nj-shop-live.pos { color: #16a34a; }
 #mrt .nj-shop-live.warn { color: #dc2626; }
 #mrt .tabular { font-variant-numeric: tabular-nums; }
-/* ---------- dropdown ---------- */
 #mrt .dd { position: relative; display: inline-block; }
 #mrt .dd-btn { display: flex; align-items: center; gap: 6px; background: #f5f5f5; border: 0; border-radius: 9999px; padding: 8px 12px; font-size: 0.75rem; font-weight: 700; color: #171717; cursor: pointer; max-width: 100%; }
 #mrt .dd-btn:hover { background: #e5e5e5; }
@@ -766,7 +750,6 @@ h1 .word{font-style:italic;font-weight:400}
 #mrt .dd-item:hover { background: #f5f5f5; }
 #mrt .dd-item.sel { color: #171717; }
 #mrt .dd-check { color: #16a34a; font-weight: 900; }
-/* ---------- month picker ---------- */
 #mrt .pk { position: relative; display: inline-block; }
 #mrt .pk-btn { display: flex; align-items: center; gap: 6px; background: #f5f5f5; border: 0; border-radius: 9999px; padding: 8px 12px; font-size: 0.75rem; font-weight: 700; color: #171717; cursor: pointer; }
 #mrt .pk-btn:hover { background: #e5e5e5; }
@@ -784,7 +767,6 @@ h1 .word{font-style:italic;font-weight:400}
 #mrt .pk-day:hover { background: #f5f5f5; }
 #mrt .pk-day.sel { background: #171717; color: #fff; }
 #mrt .pk-day.today { background: #e5e5e5; }
-/* ---------- pm form ---------- */
 #mrt .pmform { width: 100%; max-width: 448px; background: #fff; border: 1px solid #e5e5e5; border-radius: 24px; padding: 28px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); max-height: 92vh; overflow-y: auto; }
 #mrt .pmf-stack > div { margin-bottom: 16px; }
 #mrt .pmf-stack > div:last-child { margin-bottom: 0; }
@@ -808,7 +790,6 @@ h1 .word{font-style:italic;font-weight:400}
 #mrt #mrt-pmfSave:disabled { opacity: 0.4; cursor: not-allowed; }
 #mrt #mrt-pmfSave .pmf-arrow { display: flex; }
 #mrt #mrt-pmfSave .pmf-arrow svg { width: 20px; height: 20px; }
-/* ---------- detail modal ---------- */
 #mrt .det-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
 #mrt .det-name { font-size: 1.25rem; font-weight: 900; letter-spacing: -0.025em; }
 #mrt .det-sub { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
@@ -841,7 +822,6 @@ h1 .word{font-style:italic;font-weight:400}
 #mrt .det-delzone p { margin: 0 0 12px; }
 #mrt .det-delzone #mrt-detDel { background: #dc2626; color: #fff; border: 0; border-radius: 9999px; padding: 8px 20px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
 #mrt .det-confirm { display: flex; gap: 12px; align-items: center; }
-/* ---------- transfer ---------- */
 #mrt .tr-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
 #mrt .tr-label { font-weight: 700; font-size: 0.9rem; }
 #mrt .tr-arrow { color: var(--text-muted); }
@@ -852,7 +832,6 @@ h1 .word{font-style:italic;font-weight:400}
 #mrt .tr-cancel { flex: 1; background: #f5f5f5; border: 0; border-radius: 9999px; padding: 14px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
 #mrt .tr-go { flex: 1; background: #171717; color: #fff; border: 0; border-radius: 9999px; padding: 14px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
 #mrt .tr-go:disabled { opacity: 0.4; cursor: not-allowed; }
-/* ---------- history ---------- */
 #mrt .hist-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 #mrt .hist-head h3 { margin: 0; }
 #mrt .hist-pm { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 12px; }
@@ -866,8 +845,7 @@ h1 .word{font-style:italic;font-weight:400}
 #mrt .hist-amt { font-weight: 900; font-size: 0.8rem; font-variant-numeric: tabular-nums; }
 #mrt .hist-amt.inc { color: var(--income); }
 #mrt .hist-amt.exp { color: var(--expense); }
-#mrt .hist-row .badge { opacity: 1; }
-/* ---------- drill-down ---------- */
+#mrt .hist-row .mrt-badge { opacity: 1; }
 #mrt .drill-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
 #mrt .drill-head h3 { margin: 0; }
 #mrt .drill-total { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin: 4px 0 0; }
@@ -899,7 +877,6 @@ h1 .word{font-style:italic;font-weight:400}
 #mrt #mrt-childDesc { flex: 1; font-size: 0.85rem; font-weight: 700; background: transparent; border: 0; outline: none; box-shadow: none; padding: 4px 0; }
 #mrt #mrt-childAmount { width: 100px; font-size: 0.85rem; font-weight: 900; text-align: right; background: transparent; border: 0; outline: none; box-shadow: none; padding: 4px 0; }
 #mrt #mrt-childDesc:focus, #mrt #mrt-childAmount:focus { border: 0; box-shadow: none; }
-/* ---------- mini modales ---------- */
 #mrt .modal-content.narrow { max-width: 320px; padding: 20px; }
 #mrt .modal-content.narrow2 { max-width: 360px; padding: 20px; }
 #mrt .mini-title { font-size: 0.95rem; font-weight: 900; text-align: center; margin-bottom: 12px; }
@@ -1049,8 +1026,9 @@ h1 .word{font-style:italic;font-weight:400}
           <span id="mrt-panoramaText">mín —</span>
           <span id="mrt-panoramaArrow" class="panorama-arrow" hidden>↓</span>
         </button>
-        <button type="button" class="ev-trigger" id="mrt-topActionsTrigger" data-menu="top" data-cid="miruta-top-menu" aria-label="Acciones" aria-haspopup="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button><button type="button" class="btn" id="mrt-iaExportBtn" data-cid="resumen-export" title="Exportar para IA">Exportar para IA</button><span class="daylabel" id="mrt-iaExportStatus" hidden></span>
+        <button type="button" class="ev-trigger" id="mrt-topActionsTrigger" data-menu="top" data-cid="miruta-top-menu" aria-label="Acciones" aria-haspopup="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
       </div>
+      <div><button type="button" class="btn" id="mrt-iaExportBtn" data-cid="resumen-export" title="Exportar para IA">Exportar para IA</button> <span class="acc-sub" id="mrt-iaExportStatus" hidden></span></div>
       <div class="ev-menu" data-panel="top" data-cid="miruta-menu-top" hidden>
         <button type="button" class="ev-item" id="mrt-cuotasBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 L22 12 L12 22 L2 12 Z"/></svg>Simular cuotas</button>
         <button type="button" class="ev-item" id="mrt-foodBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/><path d="M2 3h3l2.5 12h11L21 7H6"/></svg>Alimentación</button>
@@ -1060,7 +1038,7 @@ h1 .word{font-style:italic;font-weight:400}
         <div id="mrt-accountsCards" data-cid="miruta-cuentas" class="accounts-cards" hidden></div>
       </div>
   
-      <div id="mrt-timeline" data-cid="miruta-timeline" class="timeline"></div>
+      <div id="mrt-timeline" data-cid="miruta-timeline"></div>
     </main>
   
     <div class="nj-overlay" id="mrt-njModal" data-cid="miruta-modal-nuevo" hidden>
@@ -2864,9 +2842,9 @@ function mrtRender() {
       incomeCard = '<div class="event-card income' + (ev.isVariable ? ' variable' : '') + '">' +
         '<div class="ev-left">' +
           '<span class="event-desc' + struck + '">' + escapeHtml(ev.description) + '</span>' +
-          (ev.isSilenced ? '<span class="badge sleep">Dormido</span>' : '') +
-          (ev.recurrence !== 'once' ? '<span class="badge rec-inc">' + escapeHtml(ev.recurrence) + '</span>' : '') +
-          (ev.isVariable ? '<span class="badge varb">Variable</span>' : '') +
+          (ev.isSilenced ? '<span class="mrt-badge sleep">Dormido</span>' : '') +
+          (ev.recurrence !== 'once' ? '<span class="mrt-badge rec-inc">' + escapeHtml(ev.recurrence) + '</span>' : '') +
+          (ev.isVariable ? '<span class="mrt-badge varb">Variable</span>' : '') +
         '</div>' +
         '<div class="ev-right">' +
           '<span class="ev-amount inc' + (ev.isSilenced ? ' silenced' : '') + '">' + fmt(ev.amount) + '</span>' +
@@ -2882,17 +2860,17 @@ function mrtRender() {
       let budgetWarn = '';
       if (ev.isCategory && ev.budgetLimit) {
         const spent = kids.reduce((s, c) => s + (Number(c.amount) || 0), 0);
-        if (spent > ev.budgetLimit) budgetWarn = '<span class="badge warn">⚠</span>';
+        if (spent > ev.budgetLimit) budgetWarn = '<span class="mrt-badge warn">⚠</span>';
       }
       expenseCard = '<div class="event-card expense' + (ev.isSilenced ? ' silenced' : '') + (agg ? ' aggregated' : '') + '">' +
         '<div class="ev-col">' +
           '<div class="ev-left">' +
             '<span class="event-desc' + struck + '">' + escapeHtml(ev.description) + '</span>' +
-            (!agg && ev.isSilenced ? '<span class="badge sleep">Dormido</span>' : '') +
-            (ev.is_credit ? '<span class="badge cred">' + (ev.cuotasTotales ? 'c ' + (ev.cuotaActual || 1) + '/' + ev.cuotasTotales : '[crédito]') + '</span>' : '') +
+            (!agg && ev.isSilenced ? '<span class="mrt-badge sleep">Dormido</span>' : '') +
+            (ev.is_credit ? '<span class="mrt-badge cred">' + (ev.cuotasTotales ? 'c ' + (ev.cuotaActual || 1) + '/' + ev.cuotasTotales : '[crédito]') + '</span>' : '') +
             budgetWarn +
-            (!agg && ev.recurrence !== 'once' ? '<span class="badge rec-exp">' + escapeHtml(ev.recurrence) + '</span>' : '') +
-            (agg ? '<button type="button" class="badge adjust" data-adjust="1">Ajustar</button>' : '') +
+            (!agg && ev.recurrence !== 'once' ? '<span class="mrt-badge rec-exp">' + escapeHtml(ev.recurrence) + '</span>' : '') +
+            (agg ? '<button type="button" class="mrt-badge adjust" data-adjust="1">Ajustar</button>' : '') +
           '</div>' +
           (!agg && ev.isCreditCardExpense && ev.paymentDate ? '<div class="payline">Pago: ' + ev.paymentDate.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' }) + '</div>' : '') +
         '</div>' +
@@ -3808,8 +3786,8 @@ function detRender() {
       const row = document.createElement('div');
       row.className = 'det-row';
       const sub = [];
-      if (x.isSilenced) sub.push('<span class="badge sleep">Dormido</span>');
-      if (x.cuotaActual && x.cuotasTotales) sub.push('<span class="badge cred">' + x.cuotaActual + '/' + x.cuotasTotales + '</span>');
+      if (x.isSilenced) sub.push('<span class="mrt-badge sleep">Dormido</span>');
+      if (x.cuotaActual && x.cuotasTotales) sub.push('<span class="mrt-badge cred">' + x.cuotaActual + '/' + x.cuotasTotales + '</span>');
       row.innerHTML =
         '<div class="det-row-left"><span class="det-row-desc">' + escapeHtml(x.description) + '</span>' +
         (sub.length ? '<span class="det-row-badges">' + sub.join('') + '</span>' : '') +
@@ -3972,7 +3950,7 @@ function histPaint() {
       '<span class="hist-date">' + new Date(r.date + 'T12:00:00').toLocaleDateString('es-CO', { day: 'numeric', month: 'short' }) + '</span>' +
       '<span class="hist-desc">' + escapeHtml(r.description) + (m ? '<small>' + escapeHtml(m.name) + '</small>' : '') + '</span>' +
       '<span class="hist-amt ' + (r.type === 'income' ? 'inc' : 'exp') + '">' + fmt(r.amount) + '</span>' +
-      '<span class="badge ' + (r.type === 'income' ? 'rec-inc' : 'rec-exp') + '">' + (typeLabel[r.type] || r.type) + '</span>';
+      '<span class="mrt-badge ' + (r.type === 'income' ? 'rec-inc' : 'rec-exp') + '">' + (typeLabel[r.type] || r.type) + '</span>';
     list.appendChild(d);
   }
 }
