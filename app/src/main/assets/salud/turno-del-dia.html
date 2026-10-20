@@ -7432,9 +7432,12 @@ function mrtBuildIaDoc(){
     var doc=mrtBuildIaDoc();
     try{window.__mrtLastDoc=doc;}catch(e){}
     var name='mi-ruta-IA-'+new Date().toISOString().slice(0,10)+'.md';
-    var saved=false,copied=false;
+    var saved=false,bridged=false,copied=false;
     try{
-      if(typeof Blob!=='undefined'&&typeof URL!=='undefined'&&URL.createObjectURL&&document.body){
+      if(window.AndroidSaveFile&&window.AndroidSaveFile.saveFile){
+        window.AndroidSaveFile.saveFile(name,btoa(unescape(encodeURIComponent(doc))));
+        saved=true;bridged=true;
+      }else if(typeof Blob!=='undefined'&&typeof URL!=='undefined'&&URL.createObjectURL&&document.body){
         var blob=new Blob([doc],{type:'text/markdown;charset=utf-8'});
         var a=document.createElement('a');
         a.href=URL.createObjectURL(blob);
@@ -7453,9 +7456,11 @@ function mrtBuildIaDoc(){
     }catch(e){}
     if(st){
       st.hidden=false;
-      st.textContent=saved
-        ?('Descargado '+name+' ('+doc.length+' caracteres)'+(copied?', copiado al portapapeles.':'.'))
-        :('Listo ('+doc.length+' caracteres), pero el navegador bloqueo la descarga'+(copied?'; copiado al portapapeles.':'.'));
+      st.textContent=bridged
+        ?('Elige donde guardar '+name+' ('+doc.length+' caracteres).')
+        :(saved
+          ?('Descargado '+name+' ('+doc.length+' caracteres)'+(copied?', copiado al portapapeles.':'.'))
+          :('Listo ('+doc.length+' caracteres), pero el navegador bloqueo la descarga'+(copied?'; copiado al portapapeles.':'.')));
     }
   });
 })();

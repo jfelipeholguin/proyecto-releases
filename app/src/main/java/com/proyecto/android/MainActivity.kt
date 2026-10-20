@@ -1,6 +1,9 @@
 package com.proyecto.android
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Base64
+import android.webkit.JavascriptInterface
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -9,6 +12,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,7 +22,46 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
+class SaveFileBridge(
+    private val activity: ComponentActivity,
+    private val onSave: (String, ByteArray) -> Unit
+) {
+    @JavascriptInterface
+    fun saveFile(name: String, base64: String) {
+        try {
+            val data = Base64.decode(base64, Base64.DEFAULT)
+            activity.runOnUiThread { onSave(name, data) }
+        } catch (_: Exception) { /* puente: entrada invalida */ }
+    }
+}
+
 class MainActivity : ComponentActivity() {
+
+    private var pendingFile: Pair<String, ByteArray>? = null
+    private val createDoc =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { res ->
+            val uri = if (res.resultCode == RESULT_OK) res.data?.data else null
+            val pending = pendingFile
+            pendingFile = null
+            if (uri != null && pending != null) {
+                try {
+                    contentResolver.openOutputStream(uri)?.use { it.write(pending.second) }
+                    Toast.makeText(this, "Guardado ${pending.first}", Toast.LENGTH_LONG).show()
+                } catch (_: Exception) {
+                    Toast.makeText(this, "No se pudo guardar.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+    private fun saveFileViaSAF(name: String, data: ByteArray) {
+        pendingFile = name to data
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "text/markdown"
+            putExtra(Intent.EXTRA_TITLE, name)
+        }
+        createDoc.launch(intent)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +78,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MaterialTheme {
-                ProyectoContent()
+                ProyectoContent(onSaveFile = ::saveFileViaSAF)
             }
         }
     }
@@ -63,7 +106,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProyectoContent() {
+fun ProyectoContent(onSaveFile: (String, ByteArray) -> Unit) {
     var showError by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -80,7 +123,8 @@ fun ProyectoContent() {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
-                onLoadError = { showError = true }
+                onLoadError = { showError = true },
+                onSaveFile = onSaveFile
             )
         }
     }
@@ -89,7 +133,8 @@ fun ProyectoContent() {
 @Composable
 fun WebViewHost(
     modifier: Modifier = Modifier,
-    onLoadError: () -> Unit
+    onLoadError: () -> Unit,
+    onSaveFile: (String, ByteArray) -> Unit
 ) {
     var canGoBack by remember { mutableStateOf(false) }
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
@@ -109,6 +154,10 @@ fun WebViewHost(
                 settings.mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
                 settings.loadWithOverviewMode = true
                 settings.useWideViewPort = true
+                addJavascriptInterface(
+                    SaveFileBridge(context as ComponentActivity, onSaveFile),
+                    "AndroidSaveFile"
+                )
                 setWebViewClient(object : WebViewClient() {
                     override fun onPageFinished(view: WebView?, url: String?) {
                         canGoBack = view?.canGoBack() ?: false
