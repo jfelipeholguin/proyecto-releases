@@ -12,8 +12,8 @@ android {
         applicationId = "com.proyecto.android"
         minSdk = 26
         targetSdk = 34
-        versionCode = 17
-        versionName = "0.4.0"
+        versionCode = 18
+        versionName = "0.5.0"
     }
 
     buildTypes {
