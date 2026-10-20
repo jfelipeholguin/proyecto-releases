@@ -1049,7 +1049,7 @@ h1 .word{font-style:italic;font-weight:400}
           <span id="mrt-panoramaText">mín —</span>
           <span id="mrt-panoramaArrow" class="panorama-arrow" hidden>↓</span>
         </button>
-        <button type="button" class="ev-trigger" id="mrt-topActionsTrigger" data-menu="top" data-cid="miruta-top-menu" aria-label="Acciones" aria-haspopup="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+        <button type="button" class="ev-trigger" id="mrt-topActionsTrigger" data-menu="top" data-cid="miruta-top-menu" aria-label="Acciones" aria-haspopup="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button><button type="button" class="btn" id="mrt-iaExportBtn" data-cid="resumen-export" title="Exportar para IA">Exportar para IA</button><span class="daylabel" id="mrt-iaExportStatus" hidden></span>
       </div>
       <div class="ev-menu" data-panel="top" data-cid="miruta-menu-top" hidden>
         <button type="button" class="ev-item" id="mrt-cuotasBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 L22 12 L12 22 L2 12 Z"/></svg>Simular cuotas</button>
@@ -4314,6 +4314,95 @@ function mrtShow(on){
   var v='turno';
   try{v=localStorage.getItem('turno.vista.v1')||'turno';}catch(e){}
   mrtShow(v==='mrt');
+})();
+
+function mrtIaFmt(n){n=Math.round(Number(n)||0);var s='$'+fmt(Math.abs(n));return n<0?'-'+s:s;}
+function mrtIaClean(s){return String(s==null?'':s).replace(/\s+/g,' ').trim();}
+function mrtBuildIaDoc(){
+  var L=[];
+  var stamp='';
+  try{stamp=new Date().toISOString().replace('T',' ').slice(0,16)+' UTC';}catch(e){}
+  var filtered=items.filter(function(i){return i.type!=='adjustment';});
+  var timeline=buildTimelineEvents(filtered,paymentMethods,recurrenceExceptions,{
+    horizonMonths:6,paidOccurrences:paidOccurrences,cycleOverrides:cycleOverrides,minimoBrain:readMinimoBrain(),
+  });
+  var spot=computeSpot(timeline);
+  var mNames={};
+  paymentMethods.forEach(function(p){if(p&&p.id)mNames[String(p.id)]=mrtIaClean(p.name)||String(p.id);});
+  L.push('# MI-RUTA · Paquete para IA (pegar en cualquier chat)');
+  L.push('> Generado '+stamp+' desde Turno del dia. Moneda: pesos colombianos ($1.000 = mil). Solo texto y numeros.');
+  L.push('');
+  L.push('## 1. ROL: actua como mi asesor financiero personal');
+  L.push('- Hablas espanol, directo, con numeros. Nada de relleno.');
+  L.push('- Usas SOLO los datos de este documento. Si falta algo, pides el dato minimo y sigues con supuestos explicitos.');
+  L.push('- Comparas opciones con numeros: ahorro en $ y %, no con adjetivos.');
+  L.push('');
+  L.push('## 2. REGLAS DE DECISION');
+  L.push('- Orden de pago: tarjeta (28,48% EA) primero, Lulo (20,57% EA) segundo, Valcredit (0%) ultimo.');
+  L.push('- Pagar deuda cara gana a invertir (9-15% EA): ahorro garantizado mayor. Solo invertir si la deuda es 0% o mas barata.');
+  L.push('- Vender un activo tiene costo real (transporte, trabajo): mencionalo aunque el numero favorezca vender.');
+  L.push('');
+  L.push('## 3. FORMATO DE RESPUESTA QUE QUIERO');
+  L.push('- Tablas cortas, montos con $, supuestos en una linea, veredicto de una linea por opcion.');
+  L.push('');
+  L.push('## 4. DATOS · Spot hoy: '+mrtIaFmt(spot));
+  L.push('');
+  L.push('## 5. DATOS · Mi Ruta: cuentas ('+paymentMethods.length+')');
+  paymentMethods.forEach(function(p){
+    L.push('- '+mrtIaClean(p.name)+' ('+mrtIaClean(p.type)+'): saldo '+mrtIaFmt(p.balance));
+  });
+  L.push('');
+  var movs=items.slice().sort(function(a,b){return String(b.date||'')<String(a.date||'')?-1:1;});
+  L.push('## 6. DATOS · Mi Ruta: movimientos ('+movs.length+', fecha desc)');
+  movs.forEach(function(it){
+    L.push('- '+mrtIaClean(it.date)+' | '+mrtIaClean(it.description)+' | '+mrtIaClean(it.type)+
+      ' | '+mrtIaFmt(it.amount)+' | '+mrtIaClean(it.recurrence)+' | '+mrtIaClean(mNames[String(it.paymentMethodId)]||it.paymentMethodId));
+  });
+  L.push('');
+  L.push('## 7. DATOS · Mi Ruta: proximos pagos Gold (vivo)');
+  timeline.filter(function(e){return e.isCreditCardAggregated&&!e.isSilenced;}).slice(0,6).forEach(function(e){
+    L.push('- '+mrtIaClean(e.date)+' | Gold | '+mrtIaFmt(e.amount));
+  });
+  L.push('');
+  L.push('## 8. NOTA DE ALCANCE');
+  L.push('- Este paquete sale de Turno del dia: solo trae Mi Ruta. Deuda total, minimo desglosado y activos viven en la app centro financiero.');
+  L.push('');
+  return L.join('\n');
+}
+(function mrtExportInit(){
+  var btn=document.getElementById('mrt-iaExportBtn');
+  var st=document.getElementById('mrt-iaExportStatus');
+  if(!btn)return;
+  btn.addEventListener('click',function(){
+    var doc=mrtBuildIaDoc();
+    try{window.__mrtLastDoc=doc;}catch(e){}
+    var name='mi-ruta-IA-'+new Date().toISOString().slice(0,10)+'.md';
+    var saved=false,copied=false;
+    try{
+      if(typeof Blob!=='undefined'&&typeof URL!=='undefined'&&URL.createObjectURL&&document.body){
+        var blob=new Blob([doc],{type:'text/markdown;charset=utf-8'});
+        var a=document.createElement('a');
+        a.href=URL.createObjectURL(blob);
+        a.download=name;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function(){try{URL.revokeObjectURL(a.href);a.remove();}catch(e){}},4000);
+        saved=true;
+      }
+    }catch(e){}
+    try{
+      if(typeof navigator!=='undefined'&&navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(doc).then(function(){},function(){});
+        copied=true;
+      }
+    }catch(e){}
+    if(st){
+      st.hidden=false;
+      st.textContent=saved
+        ?('Descargado '+name+' ('+doc.length+' caracteres)'+(copied?', copiado al portapapeles.':'.'))
+        :('Listo ('+doc.length+' caracteres), pero el navegador bloqueo la descarga'+(copied?'; copiado al portapapeles.':'.'));
+    }
+  });
 })();
 
 // /MRT-PORT
