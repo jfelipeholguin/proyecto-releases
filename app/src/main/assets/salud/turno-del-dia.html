@@ -1287,25 +1287,60 @@ h1 .word{font-style:italic;font-weight:400}
   </div>
 <script>
 /* ================= CONFIG ================= */
-const ICS_URL='https://api.mypurecloud.com/api/v2/workforcemanagement/calendar/data/ics?calendarId=17UzhvGFsCxnoMifXtu4W8o6qtHAC7grc0wu6Dmp_aI';
+const ICS_URL='https://apps.mypurecloud.com/platform/api/v2/workforcemanagement/calendar/data/ics?calendarId=17UzhvGFsCxnoMifXtu4W8o6qtHAC7grc0wu6Dmp_aI';
 const OFF_MS=-5*60*60000; /* America/Bogota = UTC-5, sin DST */
 const DAY_MS=86400000;
 
-/* Datos embebidos (respaldo offline): 27 y 28 de agosto de 2026, tiempos UTC */
+/* Datos embebidos (respaldo offline): noviembre de 2026, tiempos UTC */
 const EMBEDDED=[
- ['20260827T100000Z','20260827T120000Z','Tiempo libre'],
- ['20260827T120000Z','20260827T144500Z','En la cola'],
- ['20260827T144500Z','20260827T150000Z','Descanso'],
- ['20260827T150000Z','20260827T173000Z','En la cola'],
- ['20260827T230000Z','20260828T044500Z','Tiempo libre'],
- ['20260828T100000Z','20260828T120000Z','Tiempo libre'],
- ['20260828T123000Z','20260828T143000Z','En la cola'],
- ['20260828T143000Z','20260828T144500Z','Descanso'],
- ['20260828T144500Z','20260828T173000Z','En la cola'],
- ['20260828T173000Z','20260828T180000Z','Comida'],
- ['20260828T180000Z','20260828T200000Z','En la cola'],
- ['20260828T200000Z','20260828T203000Z','No disponible'],
- ['20260828T230000Z','20260829T044500Z','Tiempo libre']
+ ["20261102T100000Z","20261102T120000Z","Tiempo libre"],
+ ["20261102T120000Z","20261102T230000Z","Tiempo libre"],
+ ["20261102T230000Z","20261103T044500Z","Tiempo libre"],
+ ["20261103T100000Z","20261103T120000Z","Tiempo libre"],
+ ["20261103T130000Z","20261103T140000Z","Capacitación"],
+ ["20261103T140000Z","20261103T150000Z","En la cola"],
+ ["20261103T150000Z","20261103T151500Z","Descanso"],
+ ["20261103T151500Z","20261103T180000Z","En la cola"],
+ ["20261103T180000Z","20261103T183000Z","Comida"],
+ ["20261103T183000Z","20261103T203000Z","En la cola"],
+ ["20261103T203000Z","20261103T210000Z","No disponible"],
+ ["20261103T230000Z","20261104T044500Z","Tiempo libre"],
+ ["20261104T100000Z","20261104T120000Z","Tiempo libre"],
+ ["20261104T120000Z","20261104T140000Z","En la cola"],
+ ["20261104T140000Z","20261104T141500Z","Descanso"],
+ ["20261104T141500Z","20261104T170000Z","En la cola"],
+ ["20261104T170000Z","20261104T173000Z","Comida"],
+ ["20261104T173000Z","20261104T193000Z","En la cola"],
+ ["20261104T193000Z","20261104T200000Z","No disponible"],
+ ["20261104T230000Z","20261105T044500Z","Tiempo libre"],
+ ["20261105T120000Z","20261105T130000Z","Capacitación"],
+ ["20261105T130000Z","20261105T140000Z","En la cola"],
+ ["20261105T140000Z","20261105T141500Z","Descanso"],
+ ["20261105T141500Z","20261105T170000Z","En la cola"],
+ ["20261105T170000Z","20261105T173000Z","Comida"],
+ ["20261105T173000Z","20261105T193000Z","En la cola"],
+ ["20261105T193000Z","20261105T200000Z","No disponible"],
+ ["20261105T230000Z","20261106T044500Z","Tiempo libre"],
+ ["20261106T100000Z","20261106T120000Z","Tiempo libre"],
+ ["20261106T120000Z","20261106T134500Z","En la cola"],
+ ["20261106T134500Z","20261106T140000Z","Descanso"],
+ ["20261106T140000Z","20261106T143000Z","Capacitación"],
+ ["20261106T143000Z","20261106T163000Z","En la cola"],
+ ["20261106T163000Z","20261106T170000Z","Comida"],
+ ["20261106T170000Z","20261106T193000Z","En la cola"],
+ ["20261106T193000Z","20261106T200000Z","No disponible"],
+ ["20261106T230000Z","20261107T044500Z","Tiempo libre"],
+ ["20261107T100000Z","20261107T120000Z","Tiempo libre"],
+ ["20261107T124500Z","20261107T144500Z","En la cola"],
+ ["20261107T144500Z","20261107T150000Z","Descanso"],
+ ["20261107T150000Z","20261107T171500Z","En la cola"],
+ ["20261107T171500Z","20261107T174500Z","Comida"],
+ ["20261107T174500Z","20261107T201500Z","En la cola"],
+ ["20261107T201500Z","20261107T204500Z","No disponible"],
+ ["20261107T230000Z","20261108T044500Z","Tiempo libre"],
+ ["20261108T100000Z","20261108T120000Z","Tiempo libre"],
+ ["20261108T120000Z","20261108T230000Z","Tiempo libre"],
+ ["20261108T230000Z","20261109T044500Z","Tiempo libre"]
 ].map(([s,e,t])=>({start:icsTs(s),end:icsTs(e),summary:t}));
 
 /* ================= UTILIDADES ================= */
@@ -1574,7 +1609,7 @@ function render(){
   const events=byDay.get(selected)||[];
   const personal=(personalByDay.get(selected)||[]).map(p=>({start:p.start,end:p.end,summary:p.name,personal:true,id:p.id}));
   const derived=derivedByDay.get(selected)||[];
-  const hasQueue=events.some(e=>e.summary==='En la cola');
+  const hasQueue=events.some(e=>e.summary!=='Tiempo libre');
   const tl=$('timeline'),empty=$('empty');
 
   if(!hasQueue&&!personal.length&&!derived.length){
