@@ -177,7 +177,7 @@ fun WebViewHost(
                         onLoadError()
                     }
                 })
-                loadUrl("file:///android_asset/launcher.html")
+                loadUrl("file:///android_asset/salud/turno-del-dia.html")
             }
         },
         update = { webView -> webViewRef = webView }
