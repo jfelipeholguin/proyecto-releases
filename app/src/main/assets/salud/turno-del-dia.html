@@ -368,6 +368,13 @@ h1 .word{font-style:italic;font-weight:400}
           </svg>
         </button>
           <div class="umenu" id="usermenu" role="menu" aria-labelledby="base-ui-_r_c_" aria-orientation="vertical" data-slot="dropdown-menu-content" data-side="bottom" data-align="end" tabindex="-1" data-base-ui-focusable="" hidden>
+            <div role="menuitem" id="base-ui-_r_tareas_" tabindex="-1" data-slot="dropdown-menu-item" data-variant="default" class="umenuitem-8" data-act="tareas">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="utabler-icon-8" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                <path d="M8 10h8M8 14h5"></path>
+              </svg>
+              Tareas
+            </div>
             <div role="menuitem" id="base-ui-_r_4m_" tabindex="-1" data-slot="dropdown-menu-item" data-variant="default" class="umenuitem-8" data-act="cambios">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="utabler-icon-8" aria-hidden="true">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" class="uwrapper-9"></path>
@@ -449,6 +456,7 @@ h1 .word{font-style:italic;font-weight:400}
     <button class="arrow" id="next" aria-label="Día siguiente">›</button>
     <button class="btn" id="goToday">Hoy</button>
     <button class="btn" id="addEvt">+ Agregar</button>
+    <a class="btn" href="tasks.html" id="btnTareas" style="text-decoration:none;">Tareas</a>
   </div>
   <p class="daylabel" id="sleepLive" hidden></p>
 
@@ -1030,7 +1038,8 @@ loadData(false);
       '</div>';
   }
   function runUserAction(act) {
-    if (act === 'cambios') location.href = '../cambios.html';
+    if (act === 'tareas') location.href = 'tasks.html';
+    else if (act === 'cambios') location.href = '../cambios.html';
     else if (act === 'settings') openUmodal('Ajustes', settingsBody(), wireSettings);
     else if (act === 'shortcuts') openUmodal('Atajos de teclado', shortcutsBody(), null);
     else if (act === 'signout') {

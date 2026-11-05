@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tareas del Turno</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --card: #ffffff;
+      --text: #1d1d1f;
+      --muted: #86868b;
+      --accent: #2B4C7E;
+      --accent-soft: #E8EEF6;
+      --border: #e8e8ed;
+      --red: #C93A3A;
+      --red-bg: #FBEAEA;
+      --green: #1E9E6A;
+      --green-bg: #E5F5ED;
+      --amber: #C78A1A;
+      --amber-bg: #FBF3E2;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .num { font-variant-numeric: tabular-nums; }
+
+    .wrap {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 16px 24px 124px;
+    }
+
+    /* Menú selector ⋯ superior derecho */
+    .more-menu-wrap { position: relative; }
+    .more-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(18px) saturate(180%);
+      -webkit-backdrop-filter: blur(18px) saturate(180%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      transition: transform .15s ease, background .15s ease;
+    }
+    .more-btn:active { transform: scale(0.92); }
+    .more-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 190px;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      border-radius: 18px;
+      padding: 6px;
+      box-shadow: 0 14px 36px rgba(15, 23, 42, 0.14), 0 2px 8px rgba(15, 23, 42, 0.06);
+      z-index: 75;
+      display: none;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .more-dropdown.open { display: flex; }
+    .more-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      border: 0;
+      background: transparent;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+      text-decoration: none;
+      transition: background .14s ease;
+    }
+    .more-item svg { width: 17px; height: 17px; color: var(--muted); flex-shrink: 0; }
+    .more-item:hover { background: rgba(29, 29, 31, 0.06); }
+
+    /* Barra inferior Liquid Glass */
+    .tabbar {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      width: min(calc(100% - 36px), 410px);
+      z-index: 55;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      background: rgba(255, 255, 255, 0.68);
+      backdrop-filter: blur(24px) saturate(190%);
+      -webkit-backdrop-filter: blur(24px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.88);
+      border-radius: 999px;
+      padding: 8px 14px;
+      box-shadow: 0 12px 34px rgba(15, 23, 42, 0.10), 0 2px 8px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.92);
+    }
+    .tab {
+      flex: 1;
+      border: 0;
+      background: transparent;
+      padding: 7px 6px 5px;
+      border-radius: 999px;
+      font-family: inherit;
+      color: #6e737b;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: color .18s ease, transform .15s ease;
+    }
+    .tab:active { transform: scale(0.95); }
+    .tab svg { width: 23px; height: 23px; display: block; }
+    .tab .tab-lbl { font-size: 11.5px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.1; }
+    .tab.on { color: #1d1d1f; }
+    .tab.on .tab-lbl { font-weight: 700; color: #1d1d1f; }
+
+    /* Tarjetas editoriales */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 20px;
+      margin-bottom: 16px;
+    }
+    .account-hero-amt {
+      font-size: 28px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.025em;
+      color: var(--text);
+      line-height: 1.15;
+      display: inline-block;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .badge.green { background: var(--green-bg); color: var(--green); }
+    .badge.amber { background: var(--amber-bg); color: var(--amber); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    /* Filas de tareas limpias */
+    .mov {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+      gap: 12px;
+      transition: opacity .2s ease;
+    }
+    .mov:last-child { border-bottom: none; }
+    .mov.completed { opacity: 0.55; }
+    .task-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 0;
+    }
+    .task-check {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1.8px solid var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all .15s ease;
+    }
+    .task-check.checked {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+    .task-title {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--text);
+      word-break: break-word;
+    }
+    .mov.completed .task-title {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+    .task-delete {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.6;
+      transition: opacity .15s, color .15s;
+    }
+    .task-delete:hover { color: var(--red); opacity: 1; }
+
+    /* Formulario nueva tarea */
+    .add-form {
+      display: none;
+      margin-bottom: 16px;
+    }
+    .add-form.open { display: block; }
+    .form-row { display: flex; gap: 8px; }
+    .inp {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 13.5px;
+      background: #fafafc;
+      color: var(--text);
+      outline: none;
+    }
+    .inp:focus { border-color: var(--accent); background: #fff; }
+    .btn-submit {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding:2px 2px 0;">
+      <a href="turno-del-dia.html" style="text-decoration:none;font-size:12.5px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Turno del día
+      </a>
+      <div class="more-menu-wrap" id="moreMenuWrap">
+        <button type="button" class="more-btn" id="moreMenuBtn" aria-label="Menú" aria-expanded="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg>
+        </button>
+        <div class="more-dropdown" id="moreMenuDropdown" role="menu">
+          <a href="turno-del-dia.html" class="more-item" role="menuitem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span>Turno del día</span>
+          </a>
+          <a href="index.html" class="more-item" role="menuitem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            <span>Sistemas</span>
+          </a>
+          <div style="height:1px;background:rgba(0,0,0,0.06);margin:4px 6px;"></div>
+          <button type="button" class="more-item" id="toggleAddBtn" role="menuitem">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+            <span>Nueva tarea</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div class="account-hero-amt num" id="progress-text">0 / 0</div>
+        <span class="badge green" id="progress-badge"><span class="dot"></span>Tareas</span>
+      </div>
+    </div>
+
+    <div class="card add-form" id="add-form-card">
+      <form id="new-task-form" class="form-row">
+        <input type="text" id="task-title" class="inp" placeholder="Nueva tarea del turno..." required />
+        <button type="submit" class="btn-submit">Guardar</button>
+      </form>
+    </div>
+
+    <div class="card" style="padding:4px 20px;" id="tasks-container"></div>
+
+    <nav class="tabbar" aria-label="Filtro de tareas">
+      <button class="tab on" data-filter="all" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
+        <span class="tab-lbl">Todas</span>
+      </button>
+      <button class="tab" data-filter="pending" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l2.5 2.5"></path></svg>
+        <span class="tab-lbl">Pendientes</span>
+      </button>
+      <button class="tab" data-filter="completed" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+        <span class="tab-lbl">Listas</span>
+      </button>
+    </nav>
+  </div>
+
+  <script>
+    (function() {
+      var STORAGE_KEY = 'turno_tasks_v1';
+
+      var defaultTasks = [
+        { id: 1, title: 'Revisar eventos y horarios del turno', completed: true },
+        { id: 2, title: 'Comprobar pausas activas y descansos', completed: false },
+        { id: 3, title: 'Seguimiento de casos pendientes', completed: false }
+      ];
+
+      function mergeDefaultTasks(list) {
+        if (!Array.isArray(list) || list.length === 0) return JSON.parse(JSON.stringify(defaultTasks));
+        return list;
+      }
+
+      var tasks = [];
+      try {
+        var saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('animus_vault_tasks_v1');
+        tasks = saved ? mergeDefaultTasks(JSON.parse(saved)) : JSON.parse(JSON.stringify(defaultTasks));
+      } catch(e) {
+        tasks = JSON.parse(JSON.stringify(defaultTasks));
+      }
+
+      var currentFilter = 'all';
+
+      function save() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); } catch(e) {}
+      }
+
+      function updateProgress() {
+        var total = tasks.length;
+        var completed = tasks.filter(function(t) { return t.completed; }).length;
+        document.getElementById('progress-text').textContent = completed + ' / ' + total;
+        var badge = document.getElementById('progress-badge');
+        if (completed === total && total > 0) {
+          badge.className = 'badge green';
+          badge.innerHTML = '<span class="dot"></span>Al día';
+        } else {
+          badge.className = 'badge amber';
+          badge.innerHTML = '<span class="dot"></span>Pendientes';
+        }
+      }
+
+      function render() {
+        var container = document.getElementById('tasks-container');
+        container.innerHTML = '';
+
+        var filtered = tasks.filter(function(t) {
+          if (currentFilter === 'pending') return !t.completed;
+          if (currentFilter === 'completed') return t.completed;
+          return true;
+        });
+
+        if (filtered.length === 0) {
+          container.innerHTML = '<div style="padding:28px 0;text-align:center;color:var(--muted);font-size:13px;">No hay tareas en esta vista.</div>';
+          updateProgress();
+          return;
+        }
+
+        filtered.forEach(function(task) {
+          var row = document.createElement('div');
+          row.className = 'mov' + (task.completed ? ' completed' : '');
+
+          var left = document.createElement('div');
+          left.className = 'task-left';
+
+          var check = document.createElement('div');
+          check.className = 'task-check' + (task.completed ? ' checked' : '');
+          if (task.completed) {
+            check.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>';
+          }
+          check.addEventListener('click', function() {
+            task.completed = !task.completed;
+            save();
+            render();
+          });
+
+          var title = document.createElement('span');
+          title.className = 'task-title';
+          title.textContent = task.title;
+
+          left.appendChild(check);
+          left.appendChild(title);
+
+          var delBtn = document.createElement('button');
+          delBtn.className = 'task-delete';
+          delBtn.setAttribute('aria-label', 'Eliminar');
+          delBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>';
+          delBtn.addEventListener('click', function() {
+            tasks = tasks.filter(function(t) { return t.id !== task.id; });
+            save();
+            render();
+          });
+
+          row.appendChild(left);
+          row.appendChild(delBtn);
+          container.appendChild(row);
+        });
+
+        updateProgress();
+      }
+
+      // Menú desplegable
+      var moreWrap = document.getElementById('moreMenuWrap');
+      var moreBtn = document.getElementById('moreMenuBtn');
+      var moreDropdown = document.getElementById('moreMenuDropdown');
+      var addCard = document.getElementById('add-form-card');
+      var toggleAddBtn = document.getElementById('toggleAddBtn');
+
+      if (moreBtn && moreDropdown) {
+        moreBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var isOpen = moreDropdown.classList.contains('open');
+          moreDropdown.classList.toggle('open', !isOpen);
+          moreBtn.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
+        });
+        document.addEventListener('click', function(e) {
+          if (!moreWrap.contains(e.target)) {
+            moreDropdown.classList.remove('open');
+            moreBtn.setAttribute('aria-expanded', 'false');
+          }
+        });
+      }
+
+      if (toggleAddBtn && addCard) {
+        toggleAddBtn.addEventListener('click', function() {
+          moreDropdown.classList.remove('open');
+          addCard.classList.toggle('open');
+          if (addCard.classList.contains('open')) {
+            document.getElementById('task-title').focus();
+          }
+        });
+      }
+
+      // Formulario nueva tarea
+      var form = document.getElementById('new-task-form');
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          var inp = document.getElementById('task-title');
+          var text = (inp.value || '').trim();
+          if (!text) return;
+          tasks.unshift({
+            id: Date.now(),
+            title: text,
+            completed: false
+          });
+          inp.value = '';
+          addCard.classList.remove('open');
+          save();
+          render();
+        });
+      }
+
+      // Filtros
+      document.querySelectorAll('.tabbar .tab').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.tabbar .tab').forEach(function(b) { b.classList.remove('on'); });
+          btn.classList.add('on');
+          currentFilter = btn.getAttribute('data-filter') || 'all';
+          render();
+        });
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>
