@@ -785,8 +785,8 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(placeNowLine);
 
 /* ================= BLOQUES (solo eventos reales del calendario) ================= */
 function buildBlocks(events){
-  /* "Tiempo libre" viene por defecto en el calendario WFM y NO se muestra. */
-  const blocks=events.filter(e=>e.personal||e.summary!=='Tiempo libre')
+  /* Omitir "Tiempo libre" y "No disponible" */
+  const blocks=events.filter(e=>e.personal||(e.summary!=='Tiempo libre'&&e.summary.toLowerCase()!=='no disponible'))
     .map(e=>({start:e.start,end:e.end,name:e.summary,walk:false,derived:!!e.derived,personal:!!e.personal,pid:e.personal?e.id:null}));
   blocks.sort((a,b)=>a.start-b.start);
   return{blocks};
@@ -809,7 +809,7 @@ function render(){
   const events=byDay.get(selected)||[];
   const personal=(personalByDay.get(selected)||[]).map(p=>({start:p.start,end:p.end,summary:p.name,personal:true,id:p.id}));
   const derived=derivedByDay.get(selected)||[];
-  const hasQueue=events.some(e=>e.summary!=='Tiempo libre');
+  const hasQueue=events.some(e=>e.summary!=='Tiempo libre'&&e.summary.toLowerCase()!=='no disponible');
   const tl=$('timeline'),empty=$('empty');
 
   if(!hasQueue&&!personal.length&&!derived.length){
