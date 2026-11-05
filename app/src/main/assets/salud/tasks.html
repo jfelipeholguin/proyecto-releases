@@ -225,15 +225,22 @@
       border: none;
       color: var(--muted);
       cursor: pointer;
-      padding: 4px;
-      border-radius: 6px;
+      padding: 8px;
+      min-width: 38px;
+      min-height: 38px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      opacity: 0.6;
-      transition: opacity .15s, color .15s;
+      opacity: 0.7;
+      transition: opacity .15s, color .15s, background .15s;
+      flex-shrink: 0;
     }
-    .task-delete:hover { color: var(--red); opacity: 1; }
+    .task-delete:hover, .task-delete:active {
+      color: var(--red);
+      background: var(--red-bg);
+      opacity: 1;
+    }
 
     /* Formulario nueva tarea */
     .add-form {
@@ -292,6 +299,15 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
             <span>Nueva tarea</span>
           </button>
+          <div style="height:1px;background:rgba(0,0,0,0.06);margin:4px 6px;"></div>
+          <button type="button" class="more-item" id="clearCompletedBtn" role="menuitem" style="color:var(--muted)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            <span>Borrar listas</span>
+          </button>
+          <button type="button" class="more-item" id="clearAllBtn" role="menuitem" style="color:var(--red)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            <span>Borrar todas</span>
+          </button>
         </div>
       </div>
     </div>
@@ -338,17 +354,18 @@
         { id: 3, title: 'Seguimiento de casos pendientes', completed: false }
       ];
 
-      function mergeDefaultTasks(list) {
-        if (!Array.isArray(list) || list.length === 0) return JSON.parse(JSON.stringify(defaultTasks));
-        return list;
-      }
-
       var tasks = [];
       try {
-        var saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('animus_vault_tasks_v1');
-        tasks = saved ? mergeDefaultTasks(JSON.parse(saved)) : JSON.parse(JSON.stringify(defaultTasks));
+        var saved = localStorage.getItem(STORAGE_KEY);
+        if (saved !== null) {
+          tasks = JSON.parse(saved);
+          if (!Array.isArray(tasks)) tasks = [];
+        } else {
+          tasks = JSON.parse(JSON.stringify(defaultTasks));
+          save();
+        }
       } catch(e) {
-        tasks = JSON.parse(JSON.stringify(defaultTasks));
+        tasks = [];
       }
 
       var currentFilter = 'all';
@@ -416,8 +433,10 @@
           delBtn.className = 'task-delete';
           delBtn.setAttribute('aria-label', 'Eliminar');
           delBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>';
-          delBtn.addEventListener('click', function() {
-            tasks = tasks.filter(function(t) { return t.id !== task.id; });
+          delBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            tasks = tasks.filter(function(t) { return String(t.id) !== String(task.id); });
             save();
             render();
           });
@@ -459,6 +478,27 @@
           if (addCard.classList.contains('open')) {
             document.getElementById('task-title').focus();
           }
+        });
+      }
+
+      var clearCompBtn = document.getElementById('clearCompletedBtn');
+      if (clearCompBtn) {
+        clearCompBtn.addEventListener('click', function() {
+          moreDropdown.classList.remove('open');
+          tasks = tasks.filter(function(t) { return !t.completed; });
+          save();
+          render();
+        });
+      }
+
+      var clearAllBtn = document.getElementById('clearAllBtn');
+      if (clearAllBtn) {
+        clearAllBtn.addEventListener('click', function() {
+          moreDropdown.classList.remove('open');
+          if (tasks.length === 0) return;
+          tasks = [];
+          save();
+          render();
         });
       }
 
