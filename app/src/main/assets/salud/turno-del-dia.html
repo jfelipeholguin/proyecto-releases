@@ -751,7 +751,6 @@ function placeNowLine(){
     line.querySelector('#nowring').setAttribute('stroke-dasharray',NOW_C+' '+NOW_C);
   }
   const pill=line.querySelector('#nowpill'),pct=line.querySelector('#nowpct'),ring=line.querySelector('#nowring');
-  const now=Date.now();
   const blks=Array.from(tl.querySelectorAll('.blk'));
   let top=null;
   for(const b of blks){
