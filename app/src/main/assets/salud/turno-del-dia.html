@@ -88,6 +88,9 @@ h1 .word{font-style:italic;font-weight:400}
 .uflabel{display:block;font-size:12.5px;font-weight:600;color:var(--ink-soft);margin-bottom:12px}
 .uinput{display:block;width:100%;margin-top:5px;font-family:'Instrument Sans',system-ui,sans-serif;font-size:14px;font-weight:400;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .uinput:focus{outline:2px solid var(--ink);outline-offset:1px;border-color:var(--ink)}
+.past-bar{display:flex;justify-content:center;padding:8px 0 6px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.past-btn{background:none;border:0;color:var(--ink-soft);font-size:12px;cursor:pointer;font-weight:500;padding:4px 8px;border-radius:6px;transition:color .2s,background .2s;font-family:inherit}
+.past-btn:hover{color:var(--ink);background:var(--paper)}
 .uform-row{display:flex;gap:10px}
 .uform-row .uflabel{flex:1;margin-bottom:12px}
 .uform-err{color:#b91c1c!important;font-size:13px!important}
@@ -580,7 +583,7 @@ function parseICS(text){
 }
 
 /* ================= ESTADO ================= */
-let byDay=new Map(), selected=dayKey(Date.now()), source='';
+let byDay=new Map(), selected=dayKey(Date.now()), source='', showPastEvents=false;
 
 function indexEvents(events){
   byDay=new Map();
@@ -731,6 +734,14 @@ function placeNowLine(){
   let line=document.getElementById('nowline');
   const tl=$('timeline');
   if(tl.hidden||selected!==dayKey(Date.now())){if(line)line.hidden=true;return}
+  const now=Date.now();
+  if(!showPastEvents){
+    const firstBlk=tl.querySelector('.blk');
+    if(firstBlk&&+firstBlk.dataset.end<=now){
+      render();
+      return;
+    }
+  }
   if(!line){
     line=document.createElement('div');
     line.id='nowline';
@@ -828,7 +839,34 @@ function render(){
     }
   }
 
-  tl.innerHTML=rows.map((b,i)=>{
+  const now=Date.now();
+  const isToday=selected===dayKey(now);
+  const pastCount=isToday?rows.filter(b=>b.end<=now).length:0;
+  const visibleRows=(isToday&&!showPastEvents)?rows.filter(b=>b.end>now):rows;
+
+  if(visibleRows.length===0){
+    tl.hidden=true;
+    empty.classList.add('on');
+    $('emptyTitle').textContent=isToday&&pastCount>0?'Jornada completada':'Sin turno';
+    if(isToday&&pastCount>0){
+      $('emptyMsg').innerHTML='Todos los eventos de hoy han concluido.<br><button type="button" class="btn" style="margin-top:14px" id="emptyPastBtn">Ver eventos del día</button>';
+      const eb=$('emptyPastBtn');
+      if(eb)eb.addEventListener('click',()=>{showPastEvents=true;render();});
+    }else{
+      $('emptyMsg').textContent=events.length
+        ?'Este día no tiene eventos de cola.'
+        :'No hay eventos registrados para este día.';
+    }
+    placeNowLine();
+    return;
+  }
+
+  let html='';
+  if(isToday&&pastCount>0){
+    html+=`<div class="past-bar"><button type="button" class="past-btn" id="togglePastBtn">${showPastEvents?'↑ Ocultar eventos anteriores':`↓ Ver ${pastCount} eventos anteriores`}</button></div>`;
+  }
+
+  html+=visibleRows.map((b,i)=>{
     const moment=b.start===b.end;
     const cross=!moment&&dayKey(b.end)!==dayKey(b.start);
     const del=b.personal?`<button type="button" class="pdel" data-pdel="${escapeHtml(b.pid)}" aria-label="Eliminar ${escapeHtml(b.name)}" title="Eliminar">✕</button>`:'';
@@ -840,12 +878,19 @@ function render(){
       ${tEnd}
     </div>`;
   }).join('');
+
+  tl.innerHTML=html;
   tl.hidden=false;
+
+  const tog=$('togglePastBtn');
+  if(tog)tog.addEventListener('click',()=>{showPastEvents=!showPastEvents;render();});
+
   placeNowLine();
 }
 
 /* ================= NAVEGACIÓN DE DÍA ================= */
 function shift(d){
+  showPastEvents=false;
   const ms=keyToMs(selected)+d*DAY_MS;
   const dt=new Date(ms);
   selected=dt.getUTCFullYear()+'-'+pad2(dt.getUTCMonth()+1)+'-'+pad2(dt.getUTCDate());
@@ -853,7 +898,7 @@ function shift(d){
 }
 $('prev').addEventListener('click',()=>shift(-1));
 $('next').addEventListener('click',()=>shift(1));
-$('goToday').addEventListener('click',()=>{selected=dayKey(Date.now());render()});
+$('goToday').addEventListener('click',()=>{showPastEvents=false;selected=dayKey(Date.now());render()});
 document.addEventListener('keydown',e=>{
   if(e.target.closest&&e.target.closest('#usermenu,#umoremenu,#usubmenu,#umodalback'))return;
   if(e.key==='ArrowLeft')shift(-1);
