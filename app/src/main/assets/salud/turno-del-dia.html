@@ -49,7 +49,10 @@ h1 .word{font-style:italic;font-weight:400}
 .blk+.blk{border-top:1px solid var(--line)}
 .blk::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:3px;border-radius:2px;background:var(--neutral)}
 .name{font-size:14.5px;font-weight:600;line-height:1.3;margin-top:2px}
-.range{margin-top:3px;font-size:12.5px;color:var(--range);font-variant-numeric:tabular-nums}
+.range{margin-top:3px;font-size:12.5px;color:var(--range);font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:7px}
+.range .dur{font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--ink-soft);background:#eef0ea;padding:1px 6px;border-radius:4px}
+.range.end-range{margin-top:8px}
+body.dark .range .dur{background:rgba(255,255,255,0.08);color:#a1a1aa}
 .range sup{font-size:9px;letter-spacing:.04em;margin-left:3px}
 .note{margin-top:2px;font-size:12px;color:var(--ink-soft);font-style:italic}
 .blk.gap .name{font-weight:500;font-style:italic;color:var(--ink-soft)}
@@ -757,13 +760,11 @@ function placeNowLine(){
     const s=+b.dataset.start,e=+b.dataset.end;
     if(e>now){
       if(s<=now){
-        // Dentro del evento: la línea viaja entre las etiquetas de inicio y fin.
-        const rs=b.querySelectorAll('.range');
-        const first=rs[0],last=rs[rs.length-1];
-        const c0=b.offsetTop+first.offsetTop+first.offsetHeight/2;
-        const span=(last.offsetTop+last.offsetHeight/2)-(first.offsetTop+first.offsetHeight/2);
+        // Dentro del evento: calcular posición proporcional dentro del bloque
+        const pad=12;
+        const span=Math.max(b.offsetHeight-2*pad, 12);
         const p=getEventProgress(new Date(now),new Date(s),new Date(e));
-        top=c0+p*span;
+        top=b.offsetTop+pad+p*span;
         pct.textContent=Math.round(p*100)+'%';
         ring.style.strokeDashoffset=(NOW_C*(1-p)).toFixed(2);
         pill.hidden=false;
@@ -867,10 +868,14 @@ function render(){
 
   html+=visibleRows.map((b,i)=>{
     const moment=b.start===b.end;
+    const next=visibleRows[i+1];
+    const showEnd=moment?false:(!next||next.start!==b.end);
     const cross=!moment&&dayKey(b.end)!==dayKey(b.start);
     const del=b.personal?`<button type="button" class="pdel" data-pdel="${escapeHtml(b.pid)}" aria-label="Eliminar ${escapeHtml(b.name)}" title="Eliminar">✕</button>`:'';
-    const tStart=`<div class="range">${fmtHM(b.start)}</div>`;
-    const tEnd=moment?'':`<div class="range">${fmtHM(b.end)}${cross?'<sup>+1d</sup>':''}</div>`;
+    const durMin=Math.round((b.end-b.start)/60000);
+    const durBadge=(!b.gap&&!moment&&durMin>0)?`<span class="dur">${fmtDur(durMin)}</span>`:'';
+    const tStart=`<div class="range">${fmtHM(b.start)}${durBadge}</div>`;
+    const tEnd=showEnd?`<div class="range end-range">${fmtHM(b.end)}${cross?'<sup>+1d</sup>':''}</div>`:'';
     return `<div class="blk${b.walk?' walk':''}${b.derived?' derived':''}${b.gap?' gap':''}" data-start="${b.start}" data-end="${b.end}" style="animation-delay:${i*24}ms">
       ${tStart}
       <div class="name">${escapeHtml(b.name)}${del}</div>
